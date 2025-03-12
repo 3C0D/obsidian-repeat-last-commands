@@ -1,8 +1,8 @@
 declare module "@typescript-eslint/eslint-plugin" {
-  import type { ESLint } from "eslint";
+  import type { ESLint, Linter } from "eslint";
 
   const plugin: ESLint.Plugin & {
-    configs: Record<string, any>
+    configs: Record<string, Linter.Config>
   };
   export default plugin;
 }

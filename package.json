@@ -1,9 +1,8 @@
 {
-	"name": "obsidian-sample-plugin-modif",
+	"name": "repeat-last-commands",
 	"version": "1.0.0",
-	"description": "modified sample plugin",
+	"description": "Repeat last command(s). toggle pinned command with tab. get last command id",
 	"main": "main.js",
-	"type": "module",
 	"scripts": {
 		"start": "yarn install && yarn dev",
 		"dev": "tsx scripts/esbuild.config.ts",
@@ -32,6 +31,7 @@
 		"esbuild": "latest",
 		"eslint": "latest",
 		"fs-extra": "^11.2.0",
+		"monkey-around": "^3.0.0",
 		"obsidian": "latest",
 		"obsidian-typings": "latest",
 		"semver": "^7.6.0",

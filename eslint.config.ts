@@ -22,7 +22,7 @@ const configs: Linter.Config[] = [
       }
     },
     plugins: {
-      "@typescript-eslint": typescriptEslintPlugin
+      "@typescript-eslint": typescriptEslintPlugin as any // Type assertion to bypass type checking
     },
     rules: {
       // Base rules
