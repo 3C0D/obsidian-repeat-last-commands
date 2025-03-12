@@ -23,10 +23,8 @@ export function getConditions(plugin: RepeatLastCommands) {
     return { values, aliases, chooser }
 }
 
-
-
 export function aliasify(values: any, aliases: any) {
-    values.map(async (value: any) => {
+    values.map((value: any) => {
         if (value.item.id in aliases) {
             value.item.name = aliases[value.item.id].name
         }
@@ -67,43 +65,35 @@ export async function addAlias(plugin: RepeatLastCommands, result: string, selec
     const { commands } = this.app.commands
     const commandName = commands[selectedId].name
     let text: string;
-    // suggestion name {aliasName} 
-    const existingAlias = commandName.match(/[^\s]+ {(.+?)}/);
+    // suggestion name [aliasName] 
+    const existingAlias = commandName.match(/[^\s]+ \[(.*?)\]/);
     if (existingAlias) {
         const existingValue = existingAlias[1];
         if (value === "") {
-            text = `${commandName.replace(`{${existingValue}}`, "")}`.trim()
+            text = `${commandName.replace(`[${existingValue}]`, "")}`.trim()
             delete aliases[selectedId];
-            delete plugin.settings.permanentAliases[selectedId]; // Also delete from permanentAliases
         }
         else {
-            text = `${commandName.replace(`{${existingValue}}`, `{${value}}`)}`.trim();
+            text = `${commandName.replace(`[${existingValue}]`, `[${value}]`)}`.trim();
             aliases[selectedId] = { name: text }
-            plugin.settings.permanentAliases[selectedId] = text; // Add to permanentAliases
         }
     }
     // suggestion name with : or just suggestion name → create alias
     else {
         const parts = commandName.split(": ")
         if (parts.length > 1) {
-            text = `${parts[0]}: {${value}} ${parts[1]}`.trim()
+            text = `${parts[0]}: [${value}] ${parts[1]}`.trim()
             aliases[selectedId] = { name: text }
-            plugin.settings.permanentAliases[selectedId] = text; // Add to permanentAliases
         } else {
-            const prefix = value ? `{${value}}` : ""
+            const prefix = value ? `[${value}]` : ""
             text = `${commandName} ${prefix}`.trim()
-            if (value) {
-                aliases[selectedId] = { name: text }
-                plugin.settings.permanentAliases[selectedId] = text; // Add to permanentAliases
-            } else {
-                delete aliases[selectedId];
-                delete plugin.settings.permanentAliases[selectedId]; // Also delete from permanentAliases
-            }
+            value ? aliases[selectedId] = { name: text }
+                : delete aliases[selectedId];
         }
     }
     chooser.values[selectedItem].item.name = text
 
-    const { modal, instance, cmdPalette } = getModalCmdVars(plugin)
+    const { modal } = getModalCmdVars(plugin)
     await plugin.saveSettings();  
     await modal.updateSuggestions()
 }

@@ -2,7 +2,6 @@ export interface RLCSettings {
     maxLastCmds: number;
     notify: boolean;
     aliases: Record<string, Record<string, string>>;
-    permanentAliases: Record<string, string>;
     sort: boolean;
     userExcludedIDs: string[];
     ifNoCmdOpenCmdPalette: boolean;
@@ -17,7 +16,6 @@ export const DEFAULT_SETTINGS: RLCSettings = {
     maxLastCmds: 4,
     notify: true,
     aliases: {},
-    permanentAliases: {},
     sort: true,
     userExcludedIDs: [],
     ifNoCmdOpenCmdPalette: true,

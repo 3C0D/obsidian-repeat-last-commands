@@ -68,8 +68,6 @@ export default class RepeatLastCommands extends Plugin {
 			modifiers: "Ctrl",
 			scope: scope.keys[0].scope,
 			func: (evt: KeyboardEvent) => {
-				// const focusedContainer = modal.selection.focusEl// items container
-
 				const { values, chooser } = getConditions(this)
 				const selectedItem = chooser.selectedItem
 				const selectedId = values[selectedItem]?.item.id
@@ -165,6 +163,27 @@ export default class RepeatLastCommands extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+	}
+
+	onunload() {
+		// Remove all aliases when plugin is disabled
+		this.removeAllAliases();
+	}
+
+	removeAllAliases() {
+		// Get all commands
+		const commands = this.app.commands.commands;
+		
+		// For each command that has an alias in our settings
+		Object.keys(this.settings.aliases).forEach(commandId => {
+			const command = commands[commandId];
+			if (command) {
+				// Find the original command name (without our alias)
+				const originalName = command.name.replace(/\s*\[.*?\]\s*/g, '');
+				// Reset to original name
+				command.name = originalName;
+			}
+		});
 	}
 }
 

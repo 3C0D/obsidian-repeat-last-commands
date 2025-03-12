@@ -1,5 +1,5 @@
 import type { Command } from "obsidian";
-import { getModalCmdVars } from "./cmd-utils";
+import { aliasify, getConditions, getModalCmdVars } from "./cmd-utils";
 import type RepeatLastCommands from "./main";
 import { around } from "monkey-around";
 
@@ -20,10 +20,7 @@ export function onCommandTrigger(plugin: RepeatLastCommands) {//notice we must p
 
 function addCPListeners(plugin: RepeatLastCommands) {//command palette
     addInfoPalette(plugin)
-    // addClickListener(plugin)
-    // setTimeout(() => { // delay to avoid conflict with repeat last commands shortcut (ctrl)
-    //     addKeyboardListener(plugin)
-    // }, 800);
+    const { values, aliases } = getConditions(plugin)
 }
 
 function addInfoPalette(plugin: RepeatLastCommands) {
@@ -34,7 +31,7 @@ function addInfoPalette(plugin: RepeatLastCommands) {
     if (!existingInfoDiv) {
         const infoDiv = document.createElement('div');
         infoDiv.className = 'result-container-afterend';
-                infoDiv.style.textAlign = 'center';
+        infoDiv.style.textAlign = 'center';
         infoDiv.textContent = "ctrl a: alias | crtl p: pin | ctrl -: hide | ctrl +: show | ctrl h: edit hotkey";
         resultContainerEl.insertAdjacentElement("afterend", infoDiv);
         console.log("modal", modal)
