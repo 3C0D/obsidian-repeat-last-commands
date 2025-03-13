@@ -45,23 +45,23 @@ function getBuildPath(isProd: boolean): string {
   if (isProd && !process.argv.includes("-r")) {
     return "./";
   }
-  
+
   // Determine which path to use
   const envKey = process.argv.includes("-r") ? "REAL_VAULT" : "TEST_VAULT";
   const vaultPath = process.env[envKey]?.trim();
-  
+
   // If empty or undefined, we're already in the plugin folder
   if (!vaultPath) {
     return "./";
   }
-  
+
   // Check if the path already contains the plugins directory path
   const pluginsPath = path.join(".obsidian", "plugins");
   if (vaultPath.includes(pluginsPath)) {
     // Just add the manifest id to complete the path
     return path.join(vaultPath, manifest.id);
   }
-  
+
   // Otherwise, complete the full path
   return path.join(vaultPath, ".obsidian", "plugins", manifest.id);
 }
@@ -117,8 +117,8 @@ async function main(): Promise<void> {
     console.log(buildPath === "./"
       ? "Building in initial folder"
       : `Building in ${buildPath}`);
-    const stylePath = await isValidPath("src/styles.css")? "src/styles.css" : "styles.css";	
-    const entryPoints = ["src/main.ts", stylePath];
+    const stylePath = await isValidPath("src/styles.css") ? "src/styles.css" : await isValidPath("styles.css") ? "styles.css" : "";
+    const entryPoints = stylePath ? ["src/main.ts", stylePath] : ["src/main.ts"];
     const context = await createBuildContext(buildPath, isProd, entryPoints);
 
     if (isProd) {

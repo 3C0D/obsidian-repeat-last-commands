@@ -17,6 +17,7 @@ declare module 'obsidian' {
     interface Commands {
         commands: Record<string, Command>;
         executeCommandById: (commandId: string) => boolean;
+        executeCommand: (command: Command) => boolean;
     }
 }
 
