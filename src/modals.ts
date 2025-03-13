@@ -1,16 +1,17 @@
 import { App, Modal, Scope, Setting, SuggestModal, TextComponent } from "obsidian";
 import RepeatLastCommands from "./main";
-import { getCommandIds, getCommandName, getConditions } from "./cmd-utils";
+import { getCommandIds, getCommandName, getConditions, getModalCmdVars } from "./cmd-utils";
 import type { LastCommand } from "./types";
 
 export class LastCommandsModal extends SuggestModal<LastCommand> {
     constructor(public plugin: RepeatLastCommands) {
         super(plugin.app);
-        this.plugin = plugin;
     }
 
     getSuggestions(query: string): LastCommand[] {
-        let lastCommandsArr = this.plugin.lastCommands.map(id => [id, getCommandName(id)]).reverse();
+        const { instance } = getModalCmdVars(this.plugin)
+        const lastCommands = instance.recentCommands;
+        let lastCommandsArr = lastCommands.map(id => [id, getCommandName(id)]).reverse();
         if (this.plugin.settings.includeCmdPaletteOPen) {
             lastCommandsArr = [...lastCommandsArr, ["command-palette:open", "Open Command Palette"]]
         }

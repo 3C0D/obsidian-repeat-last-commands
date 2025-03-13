@@ -13,7 +13,7 @@ export interface RLCSettings {
 export type LastCommand = [string, string][]
 
 export const DEFAULT_SETTINGS: RLCSettings = {
-    maxLastCmds: 4,
+    maxLastCmds: 10,
     notify: true,
     aliases: {},
     sort: true,

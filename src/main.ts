@@ -1,15 +1,14 @@
 import { Notice, Plugin, type Command } from 'obsidian';
 import { type RLCSettings, DEFAULT_SETTINGS } from "./types";
 import { addAlias, getConditions, getModalCmdVars } from './cmd-utils';
-import { onCommandTrigger } from './palette';
-import { AliasModal, hideCmd, ShowAgainCmds } from './modals';
+import { onCommandTrigger, shouldExcludeCommand } from './palette';
+import { AliasModal, hideCmd, LastCommandsModal, ShowAgainCmds } from './modals';
 import { around } from 'monkey-around';
 
+// voir last command 
 
 export default class RepeatLastCommands extends Plugin {
 	settings: RLCSettings;
-	lastCommand: string | null
-	lastCommands: string[] = []
 
 	async onload() {
 		await this.loadSettings();
@@ -19,9 +18,10 @@ export default class RepeatLastCommands extends Plugin {
 			listCommands(old) {
 				return function (...args: any[]) {
 					const commands: Command[] = old.call(this, ...args);
+
 					// Filter excluded commands
 					const filteredCommands = commands.filter((command) => !settings.excludeCommands.includes(command.id));
-					
+
 					// Apply aliases to command names
 					if (settings.aliases) {
 						filteredCommands.forEach(command => {
@@ -30,7 +30,15 @@ export default class RepeatLastCommands extends Plugin {
 							}
 						});
 					}
-					
+
+					const { instance, cmdPalette } = getModalCmdVars(this)
+
+					// Filter out our plugin commands and user excluded commands from recent commands
+					// Pass settings directly instead of 'this'
+					instance.recentCommands = instance.recentCommands.filter(id => {
+						return !shouldExcludeCommand(settings, id)
+					});
+
 					return filteredCommands;
 				}
 			}
@@ -41,21 +49,61 @@ export default class RepeatLastCommands extends Plugin {
 		this.addCommand({
 			id: "repeat-last-command",
 			name: "Repeat last command",
-			editorCallback: async (editor, ctx) => {
+			editorCallback: async () => {
 				const { instance } = getModalCmdVars(this)
-				const currentCommandId = "repeat-last-commands:repeat-last-command";
-
-				// Filter out the current command from recent commands
-				instance.recentCommands = instance.recentCommands.filter(id => id !== currentCommandId);
-
-				// Get the most recent command (excluding our command)
+				// Get the most recent command
 				const lastCommand = instance.recentCommands[0];
-				if (lastCommand) {
-					// Execute the last command
+				// shouldn't happen anymore obsidian register last command even after restart
+				if (!lastCommand) {
+					new Notice(text)
+					if (this.settings.ifNoCmdOpenCmdPalette) {
+						setTimeout(() => {
+							this.app.commands.executeCommandById("command-palette:open")
+						}, 400);// don't remember why the timer but it doesn't matter
+					}
+				} else {
+					new Notice(`Last command: ${lastCommand}`);
 					this.app.commands.executeCommandById(lastCommand);
 				}
 			}
 		})
+
+		const text = this.settings.ifNoCmdOpenCmdPalette ? "No last command.\nopening command palette..." : "No last command"
+
+		this.addCommand({
+			id: "repeat-commands",
+			name: "Repeat commands",
+			callback: async () => {
+				const { instance } = getModalCmdVars(this)
+				const lastCommands = instance.recentCommands;
+				if (lastCommands.length) {
+					new LastCommandsModal(this).open()
+				}
+				else {
+					new Notice(text)
+					if (this.settings.ifNoCmdOpenCmdPalette) {
+						setTimeout(() => {
+							this.app.commands.executeCommandById("command-palette:open")
+						}, 400);
+					}
+				}
+			},
+		});
+
+		this.addCommand({
+			id: "get-last-command",
+			name: "Copy last command id in clipbooard",
+			callback: async () => {
+				const { instance } = getModalCmdVars(this)
+				const lastCommand = instance.recentCommands[0];
+				if (lastCommand) {
+					try {
+						await navigator.clipboard.writeText(lastCommand)
+						new Notice("Command id copied in clipboard")
+					} catch (err) { console.error(err) }
+				} else new Notice("No last command")
+			},
+		});
 	}
 
 	modifyScope() {
@@ -173,7 +221,7 @@ export default class RepeatLastCommands extends Plugin {
 	removeAllAliases() {
 		// Get all commands
 		const commands = this.app.commands.commands;
-		
+
 		// For each command that has an alias in our settings
 		Object.keys(this.settings.aliases).forEach(commandId => {
 			const command = commands[commandId];
