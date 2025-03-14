@@ -19,23 +19,12 @@ export function onCommandTrigger(plugin: RepeatLastCommands) {
     });
 }
 
-// when a command is not run from command palette.
-// function onHKTrigger(plugin: RepeatLastCommands, id: string) {
-//     const { modal } = getModalCmdVars(plugin)
-//     // if no win e.g run from hotkey
-//     if (!modal.win && !shouldExcludeCommand(plugin.settings, id)) {
-//         applySelectedId(id!, plugin)
-//     }
-// }
-
 export function shouldExcludeCommand(settings: RLCSettings, commandId: string) {
-    const userExcludedIDs = settings.userExcludedIDs || [];
-
     return (
         commandId === "repeat-last-commands:repeat-last-command" ||
         commandId === "repeat-last-commands:repeat-commands" ||
         commandId === "repeat-last-commands:get-last-command" ||
-        userExcludedIDs.some(excludedID => commandId.startsWith(excludedID))
+        settings.excludeCommands.includes(commandId)
     );
 }
 

@@ -1,27 +1,27 @@
 export interface RLCSettings {
-    maxLastCmds: number;
-    notify: boolean;
     aliases: Record<string, Record<string, string>>;
-    sort: boolean;
-    userExcludedIDs: string[];
-    ifNoCmdOpenCmdPalette: boolean;
     includeCmdPaletteOPen: boolean;
     showCmdId: boolean;
     excludeCommands: string[]
 }
 
-export type LastCommand = [string, string][]
+export type LastCommand = string[]
 
 export const DEFAULT_SETTINGS: RLCSettings = {
-    maxLastCmds: 10,
-    notify: true,
     aliases: {},
-    sort: true,
-    userExcludedIDs: [],
-    ifNoCmdOpenCmdPalette: true,
     includeCmdPaletteOPen: false,
     showCmdId: false,
     excludeCommands: []
+}
+
+export interface CommandScope {
+    keys: Array<{
+        scope: any;
+        modifiers: string | null;
+        key: string;
+        func: Function;
+    }>;
+    tabFocusContainerEl: HTMLElement;
 }
 
 export interface CommandPaletteModal {
@@ -45,6 +45,18 @@ export interface CommandPaletteModal {
             className: string;
             isSelected?: boolean;
         }>;
+        addMessage: (e: any) => void;
+        addSuggestion: (e: any) => void;
+        forceSetSelectedItem: (e: any, t?: any) => void;
+        onSuggestionClick: (e: any, t: any) => void;
+        onSuggestionMouseover: (e: any, t: any) => void;
+        pageDown: (e: any) => void;
+        pageUp: (e: any) => void;
+        setSelectedItem: (e: any, t?: any) => void;
+        setSuggestions: (e: any) => void;
+        useSelectedItem: (e: any) => void;
+        numVisibleItems: number;
+        rowHeight: number;
     };
     resultContainerEl: HTMLElement;
     bgEl: HTMLDivElement;
@@ -62,15 +74,7 @@ export interface CommandPaletteModal {
         shouldAnimate: boolean;
         shouldRestoreSelection: boolean;
     };
-    scope: {
-        keys: Array<{
-            scope: any;
-            modifiers: string | null;
-            key: string;
-            func: Function;
-        }>;
-        tabFocusContainerEl: HTMLElement;
-    };
+    scope: CommandScope;
 }
 
 export interface CommandPaletteInstance {

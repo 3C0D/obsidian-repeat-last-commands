@@ -1,12 +1,11 @@
-import { Notice, Plugin, type Command } from 'obsidian';
+import { Plugin } from 'obsidian';
 import { type RLCSettings, DEFAULT_SETTINGS } from "./types";
-import { getConditions, getModalCmdVars } from './cmd-utils';
-import { onCommandTrigger, shouldExcludeCommand } from './palette';
-import { around } from 'monkey-around';
+import { onCommandTrigger } from './palette';
 import { CommandManager } from './command-manager';
 import { KeyboardManager } from './keyboard-manager';
 import { registerCommandFilter } from './command-filter';
 import { UIManager } from './ui-manager';
+import { RLCSettingTab } from './settings';
 
 export default class RepeatLastCommands extends Plugin {
 	settings: RLCSettings;
@@ -18,6 +17,7 @@ export default class RepeatLastCommands extends Plugin {
 	async onload() {
 		// Load user settings from storage
 		await this.loadSettings();
+		this.addSettingTab(new RLCSettingTab(this));
 
 		// Initialize the command manager that centralizes recent commands execution logic
 		this.commandManager = new CommandManager(this);
@@ -27,9 +27,6 @@ export default class RepeatLastCommands extends Plugin {
 
 		// Initialize the UI manager for interface elements
 		this.uiManager = new UIManager(this);
-
-
-		// this.addSettingTab(new RLCSettingTab(this));
 
 		// Register filter that modifies command display (aliases, exclusions)
 		this.register(registerCommandFilter(this));
@@ -90,7 +87,7 @@ export default class RepeatLastCommands extends Plugin {
 			const command = commands[commandId];
 			if (command) {
 				// Find the original command name (without our alias)
-				const originalName = command.name.replace(/\s*\[.*?\]\s*/g, '');
+				const originalName = command.name.replace(/^\[.*?\]\s*/, '');
 				// Reset to original name
 				command.name = originalName;
 			}

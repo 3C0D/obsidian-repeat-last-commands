@@ -1,10 +1,10 @@
 import 'obsidian'
 
 declare module 'obsidian' {
-    interface App {
-        commands: Commands;
-        internalPlugins: InternalPlugins
-    }
+    // interface App {
+    //     commands: Commands;
+    //     internalPlugins: InternalPlugins
+    // }
 
     interface InternalPlugins {
         getPluginById: (id: InternalPlugin) => Plugin;
@@ -14,11 +14,12 @@ declare module 'obsidian' {
         instance: any;
     }
 
-    interface Commands {
-        commands: Record<string, Command>;
-        executeCommandById: (commandId: string) => boolean;
-        executeCommand: (command: Command) => boolean;
-    }
+    // interface Commands {
+    //     commands: Record<string, Command>;
+    //     executeCommandById: (commandId: string) => boolean;
+    //     executeCommand: (command: Command) => boolean;
+
+    // }
 }
 
 type InternalPlugin = "audio-recorder" |

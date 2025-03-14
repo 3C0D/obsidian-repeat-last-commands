@@ -1,5 +1,5 @@
 import RepeatLastCommands from "./main"
-import { Notice } from "obsidian";
+import { App, Notice } from "obsidian";
 import type { CommandPalette, CommandPaletteInstance } from "./types";
 
 export function getCmdPalette(plugin: RepeatLastCommands):CommandPalette {
@@ -31,22 +31,19 @@ export function aliasify(values: any, aliases: any) {
     })
 }
 
-export function getBackSelection(chooser: any, selectedItem: number) {
-    for (let i = 1; i <= selectedItem; i++) {
-        try {
-            if (selectedItem)
-                chooser.moveDown(1)
-        } catch {
+export function getCommandName(app: App, id: string): string {
+    try {
+        const command = app.commands.findCommand(id);
+        if (command) {
+            return command.name;
         }
+    } catch (err) {
+        console.log("Error finding command:", err);
     }
+    return id; // Return the ID if the name is not found
 }
 
-export function getCommandName(id: string) {
-    const command = this.app.commands.findCommand(id);
-    return command.name;
-}
-
-export function getCommandIds(names: string[]) {
+export function getCommandIdsByNames(names: string[]) {
     const ids: string[] = []
     for (const key in this.app.commands.commands) {
         const command = this.app.commands.commands[key];
@@ -65,35 +62,42 @@ export async function addAlias(plugin: RepeatLastCommands, result: string, selec
     const { commands } = this.app.commands
     const commandName = commands[selectedId].name
     let text: string;
-    // suggestion name [aliasName] 
-    const existingAlias = commandName.match(/[^\s]+ \[(.*?)\]/);
-    if (existingAlias) {
-        const existingValue = existingAlias[1];
-        if (value === "") {
-            text = `${commandName.replace(`[${existingValue}]`, "")}`.trim()
-            delete aliases[selectedId];
-        }
-        else {
-            text = `${commandName.replace(`[${existingValue}]`, `[${value}]`)}`.trim();
-            aliases[selectedId] = { name: text }
-        }
+    
+    // Remove any existing alias (format [alias])
+    const cleanedName = commandName.replace(/^\[.*?\]\s*/, '');
+    
+    if (value === "") {
+        // If no alias is provided, simply remove the existing alias
+        text = cleanedName;
+        delete aliases[selectedId];
+    } else {
+        // Add the new alias at the beginning of the name
+        text = `[${value}] ${cleanedName}`;
+        aliases[selectedId] = { name: text };
     }
-    // suggestion name with : or just suggestion name → create alias
-    else {
-        const parts = commandName.split(": ")
-        if (parts.length > 1) {
-            text = `${parts[0]}: [${value}] ${parts[1]}`.trim()
-            aliases[selectedId] = { name: text }
-        } else {
-            const prefix = value ? `[${value}]` : ""
-            text = `${commandName} ${prefix}`.trim()
-            value ? aliases[selectedId] = { name: text }
-                : delete aliases[selectedId];
-        }
-    }
+    
     chooser.values[selectedItem].item.name = text
 
     const { modal } = getModalCmdVars(plugin)
     await plugin.saveSettings();  
     await modal.updateSuggestions()
+}
+
+export async function getBackSelection(chooser: any, selectedItem: number) {
+    try {
+        chooser.forceSetSelectedItem(selectedItem);
+    } catch (err) {
+        console.log("Error setting selection:", err);
+    }
+}
+
+export async function getBackSelectionById(chooser: any, values: any[], itemId: string) {
+    try {
+        const newIndex = values.findIndex(v => v.item.id === itemId);
+        if (newIndex !== -1) {
+            chooser.forceSetSelectedItem(newIndex);
+        }
+    } catch (err) {
+        console.log("Error finding item by ID:", err);
+    }
 }

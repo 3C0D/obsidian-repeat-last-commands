@@ -23,7 +23,7 @@ export class UIManager {
             const infoDiv = document.createElement('div');
             infoDiv.className = 'result-container-afterend';
             infoDiv.style.textAlign = 'center';
-            infoDiv.textContent = "ctrl a: alias | crtl p: pin | ctrl -: hide | ctrl +: show | ctrl h: edit hotkey";
+            infoDiv.innerHTML = "Ctrl+A: alias | Ctrl+P: pin | Ctrl+-: hide | Ctrl++: show | Ctrl+H: edit hotkey";
             resultContainerEl.insertAdjacentElement("afterend", infoDiv);
         }
     }
