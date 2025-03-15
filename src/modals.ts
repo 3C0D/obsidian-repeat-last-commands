@@ -20,11 +20,7 @@ export class LastCommandsModal extends SuggestModal<LastCommand> {
             } catch (error) {
                 return [id, id];
             }
-        }).reverse();
-        
-        if (this.plugin.settings.includeCmdPaletteOPen) {
-            lastCommandsArr = [...lastCommandsArr, ["command-palette:open", "Open Command Palette"]];
-        }
+        });
 
         return lastCommandsArr.filter(cmd =>
             cmd[1].toLowerCase().includes(query.toLowerCase())
