@@ -34,7 +34,7 @@ async function updateJsonFile(filename: string, updateFn: (json: any) => void): 
   try {
     const content = JSON.parse(await readFile(filename, "utf8"));
     updateFn(content);
-    await writeFile(filename, JSON.stringify(content, null, "2"));
+    await writeFile(filename, JSON.stringify(content, null, "\t"));
   } catch (error) {
     console.error(`Error updating ${filename}:`, error instanceof Error ? error.message : String(error));
     throw error;
