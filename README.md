@@ -104,7 +104,7 @@ This project is licensed under the MIT License.
 1. `yarn start`
 2. `yarn bacp`
 3. `yarn v` (or `yarn update-version`)
-4. `yarn release`
+4. `yarn r` (or `yarn release`)
 
 ### Additional Features
 

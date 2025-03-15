@@ -13,6 +13,7 @@
 		"update-version": "tsx scripts/update-version.ts",
 		"v": "tsx scripts/update-version.ts",
 		"release": "tsx scripts/release.ts",
+		"r": "tsx scripts/release.ts",
 		"lint": "eslint . --ext .ts",
 		"lint:fix": "eslint . --ext .ts --fix"
 	},

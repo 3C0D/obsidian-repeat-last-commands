@@ -68,13 +68,18 @@ async function updateVersion(): Promise<void> {
       return;
     }
 
-    await updateManifestVersions(targetVersion);
-
     try {
+      // Update all files first
+      await updateManifestVersions(targetVersion);
+      console.log(`Files updated to version ${targetVersion}`);
+      
+      // Add files to git
       gitExec("git add manifest.json package.json versions.json");
       gitExec(`git commit -m "Updated to version ${targetVersion}"`);
-    } catch {
-      console.log("Commit already exists or failed.");
+      console.log("Changes committed");
+    } catch (error) {
+      console.error("Error during update or commit:", error instanceof Error ? error.message : String(error));
+      console.log("Operation failed.");
       return;
     }
 
