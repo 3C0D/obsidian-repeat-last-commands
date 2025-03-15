@@ -1,7 +1,7 @@
 import type RepeatLastCommands from './main';
 import { addAlias, getConditions, getModalCmdVars } from './cmd-utils';
 import { AliasModal, hideCmd, ShowAgainCmds } from './modals';
-import type { CommandPaletteModal, CommandPaletteInstance, CommandPalette, CommandScope } from './types';
+import type { CommandPalettePlugin, CommandPalettePluginInstance, CommandPalettePluginModal, CommandScope } from 'obsidian-typings';
 
 export class KeyboardManager {
     constructor(private plugin: RepeatLastCommands) {
@@ -18,7 +18,7 @@ export class KeyboardManager {
         this.registerHotkeyCommand(scope);
     }
 
-    private registerPinCommand(scope: CommandScope, modal: CommandPaletteModal, instance: CommandPaletteInstance, cmdPalette: CommandPalette): void {
+    private registerPinCommand(scope: CommandScope, modal: CommandPalettePluginModal, instance:CommandPalettePluginInstance, cmdPalette: CommandPalettePlugin | null): void {
         scope.keys.push({
             key: "P",
             modifiers: "Ctrl",
@@ -59,14 +59,13 @@ export class KeyboardManager {
 
                 new AliasModal(this.plugin.app, this.plugin, selectedItem, async (result) => {
                     await addAlias(this.plugin, result, selectedItem);
-                    const { modal, instance, cmdPalette } = getModalCmdVars(this.plugin);
                     await getBackSelection(chooser, selectedItem);
                 }).open();
             }
         });
     }
 
-    private registerShowCommand(scope: CommandScope, modal: CommandPaletteModal): void {
+    private registerShowCommand(scope: CommandScope, modal: CommandPalettePluginModal): void {
         scope.keys.push({
             key: "+",
             modifiers: "Ctrl",
@@ -77,7 +76,7 @@ export class KeyboardManager {
         });
     }
 
-    private registerHideCommand(scope: CommandScope, modal: CommandPaletteModal): void {
+    private registerHideCommand(scope: CommandScope, modal: CommandPalettePluginModal): void {
         scope.keys.push({
             key: "-",
             modifiers: "Ctrl",
@@ -86,7 +85,7 @@ export class KeyboardManager {
                 const { values, chooser } = getConditions(this.plugin);
                 const selectedItem = chooser.selectedItem;
                 
-                // Mémoriser l'ID de la commande suivante (si elle existe)
+                // Store the ID of the next command (if it exists)
                 const nextItemId = selectedItem < values.length - 1 
                     ? values[selectedItem + 1]?.item.id 
                     : values[selectedItem]?.item.id;
@@ -95,7 +94,7 @@ export class KeyboardManager {
                 modal.close();
                 this.plugin.app.commands.executeCommandById("command-palette:open");
                 
-                // Attendre que la palette se rouvre et sélectionner la commande suivante
+                // Wait for the palette to reopen and select the next command
                 setTimeout(async () => {
                     const { values: newValues, chooser: newChooser } = getConditions(this.plugin);
                     await getBackSelectionById(newChooser, newValues, nextItemId);

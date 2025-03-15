@@ -1,11 +1,11 @@
 import { Notice } from 'obsidian';
 import type RepeatLastCommands from './main';
 import { getModalCmdVars } from './cmd-utils';
-import type { CommandPaletteInstance } from './types';
 import { LastCommandsModal } from './modals';
+import type { CommandPalettePluginInstance } from 'obsidian-typings';
 
 export class CommandManager {
-    private instance: CommandPaletteInstance;
+    private instance: CommandPalettePluginInstance;
 
     constructor(private plugin: RepeatLastCommands) {
         const { instance } = getModalCmdVars(this.plugin);

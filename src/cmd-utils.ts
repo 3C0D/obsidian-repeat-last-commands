@@ -1,16 +1,22 @@
 import RepeatLastCommands from "./main"
 import { App, Notice } from "obsidian";
-import type { CommandPalette, CommandPaletteInstance } from "./types";
+import type { CommandPalettePlugin } from 'obsidian-typings';
 
-export function getCmdPalette(plugin: RepeatLastCommands):CommandPalette {
-    return plugin.app.internalPlugins.getPluginById("command-palette")
+export function getCmdPalette(plugin: RepeatLastCommands):  CommandPalettePlugin | null{
+    const cmdPalette = plugin.app.internalPlugins.getPluginById("command-palette");
+    if (!cmdPalette) {
+        return null;
+    }
+    return cmdPalette;
 }
 
 export function getModalCmdVars(plugin: RepeatLastCommands) {
     const cmdPalette = getCmdPalette(plugin)
     if (!cmdPalette) {
-        new Notice("Command Palette not found")}
-    const instance: CommandPaletteInstance = cmdPalette?.instance
+        new Notice("Command palette plugin not found");
+        throw new Error("Command palette plugin not found");
+    }
+    const instance = cmdPalette!.instance
     const modal = instance?.modal
     return { modal, instance, cmdPalette }
 }
@@ -43,7 +49,7 @@ export function getCommandName(app: App, id: string): string {
     return id; // Return the ID if the name is not found
 }
 
-export function getCommandIdsByNames(names: string[]) {
+export function getCommandIdsByNames(names: string[]): string[] {
     const ids: string[] = []
     for (const key in this.app.commands.commands) {
         const command = this.app.commands.commands[key];
@@ -54,6 +60,9 @@ export function getCommandIdsByNames(names: string[]) {
     return ids;
 }
 
+/**
+ * Adds an [alias] at the beginning of the command. If no alias is provided, the existing alias is removed.
+ */
 export async function addAlias(plugin: RepeatLastCommands, result: string, selectedItem: number) {
     const { values, aliases, chooser } = getConditions(plugin)
     const { item } = values[selectedItem]
@@ -62,10 +71,10 @@ export async function addAlias(plugin: RepeatLastCommands, result: string, selec
     const { commands } = this.app.commands
     const commandName = commands[selectedId].name
     let text: string;
-    
+
     // Remove any existing alias (format [alias])
     const cleanedName = commandName.replace(/^\[.*?\]\s*/, '');
-    
+
     if (value === "") {
         // If no alias is provided, simply remove the existing alias
         text = cleanedName;
@@ -75,11 +84,11 @@ export async function addAlias(plugin: RepeatLastCommands, result: string, selec
         text = `[${value}] ${cleanedName}`;
         aliases[selectedId] = { name: text };
     }
-    
+
     chooser.values[selectedItem].item.name = text
 
     const { modal } = getModalCmdVars(plugin)
-    await plugin.saveSettings();  
+    await plugin.saveSettings();
     await modal.updateSuggestions()
 }
 

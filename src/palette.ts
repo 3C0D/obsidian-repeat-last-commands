@@ -1,5 +1,4 @@
 import type { Command } from "obsidian";
-import { getModalCmdVars } from "./cmd-utils";
 import type RepeatLastCommands from "./main";
 import { around } from "monkey-around";
 import type { RLCSettings } from "./types";
@@ -27,20 +26,3 @@ export function shouldExcludeCommand(settings: RLCSettings, commandId: string) {
         settings.excludeCommands.includes(commandId)
     );
 }
-
-// function applySelectedId(id: string, plugin: RepeatLastCommands) {
-//     // command
-//     const { settings } = plugin
-//     const { instance } = getModalCmdVars(this.plugin)
-//     const lastCommands = instance.recentCommands;
-//     // plugin.lastCommand = id // Est ce qu'on doit enregistrer cette commande ?
-
-//     // commands
-//     const maxEntries = settings.maxLastCmds;
-//     if (lastCommands.length > maxEntries) {
-//         lastCommands.shift();
-//     }
-//     lastCommands.push(id)
-//     lastCommands = [...new Set(lastCommands)];
-//     plugin.saveSettings()
-// }

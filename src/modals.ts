@@ -26,10 +26,9 @@ export class LastCommandsModal extends SuggestModal<LastCommand> {
             lastCommandsArr = [...lastCommandsArr, ["command-palette:open", "Open Command Palette"]];
         }
 
-        const ret = lastCommandsArr.filter(cmd =>
+        return lastCommandsArr.filter(cmd =>
             cmd[1].toLowerCase().includes(query.toLowerCase())
-        );
-        return ret;
+        );        
     }
 
     renderSuggestion(cmd: LastCommand, el: HTMLElement) {
@@ -64,8 +63,6 @@ export class LastCommandsModal extends SuggestModal<LastCommand> {
         instance.recentCommands.push(commandId);
     }
 }
-
-
 
 export class AliasModal extends Modal {
     result: string;
