@@ -10,7 +10,8 @@
 		"real": "tsx scripts/esbuild.config.ts production -r",
 		"acp": "tsx scripts/acp.ts",
 		"bacp": "tsx scripts/acp.ts -b",
-		"version": "tsx scripts/update-version.ts",
+		"update-version": "tsx scripts/update-version.ts",
+		"v": "tsx scripts/update-version.ts",
 		"release": "tsx scripts/release.ts",
 		"lint": "eslint . --ext .ts",
 		"lint:fix": "eslint . --ext .ts --fix"
