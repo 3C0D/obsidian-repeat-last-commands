@@ -50,7 +50,7 @@ async function updateManifestVersions(targetVersion: string): Promise<void> {
       updateJsonFile("manifest.json", json => json.version = targetVersion),
       updateJsonFile("versions.json", json => json[targetVersion] = minAppVersion),
       updateJsonFile("package.json", json => json.version = targetVersion),
-      updateJsonFile("package-lock.json", json => json.version = targetVersion)
+      // updateJsonFile("package-lock.json", json => json.version = targetVersion)
     ]);
   } catch (error) {
     console.error("Error updating manifest versions:", error instanceof Error ? error.message : String(error));
