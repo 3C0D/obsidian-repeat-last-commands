@@ -1,7 +1,7 @@
 import type RepeatLastCommands from './main';
 import { addAlias, getConditions, getModalCmdVars } from './cmd-utils';
 import { AliasModal, hideCmd, ShowAgainCmds } from './modals';
-import type { CommandPalettePlugin, CommandPalettePluginInstance, CommandPalettePluginModal, CommandScope } from 'obsidian-typings';
+import type { CommandPalettePlugin, CommandPalettePluginInstance, CommandPalettePluginModal, CommandScope, HotkeysSettingTab } from 'obsidian-typings';
 
 export class KeyboardManager {
     constructor(private plugin: RepeatLastCommands) {
@@ -18,7 +18,7 @@ export class KeyboardManager {
         this.registerHotkeyCommand(scope);
     }
 
-    private registerPinCommand(scope: CommandScope, modal: CommandPalettePluginModal, instance:CommandPalettePluginInstance, cmdPalette: CommandPalettePlugin | null): void {
+    private registerPinCommand(scope: CommandScope, modal: CommandPalettePluginModal, instance: CommandPalettePluginInstance, cmdPalette: CommandPalettePlugin | null): void {
         scope.keys.push({
             key: "P",
             modifiers: "Ctrl",
@@ -84,16 +84,16 @@ export class KeyboardManager {
             func: async () => {
                 const { values, chooser } = getConditions(this.plugin);
                 const selectedItem = chooser.selectedItem;
-                
+
                 // Store the ID of the next command (if it exists)
-                const nextItemId = selectedItem < values.length - 1 
-                    ? values[selectedItem + 1]?.item.id 
+                const nextItemId = selectedItem < values.length - 1
+                    ? values[selectedItem + 1]?.item.id
                     : values[selectedItem]?.item.id;
-                
+
                 await hideCmd(this.plugin, selectedItem, chooser);
                 modal.close();
                 this.plugin.app.commands.executeCommandById("command-palette:open");
-                
+
                 // Wait for the palette to reopen and select the next command
                 setTimeout(async () => {
                     const { values: newValues, chooser: newChooser } = getConditions(this.plugin);
@@ -116,11 +116,11 @@ export class KeyboardManager {
                 this.plugin.app.setting.open();
                 this.plugin.app.setting.animateOpen();
                 this.plugin.app.setting.openTabById("hotkeys");
-                const tab = this.plugin.app.setting.activeTab!;
+                const tab = this.plugin.app.setting.activeTab as HotkeysSettingTab;
                 const input = tab.containerEl.querySelector("input")!;
                 input.focus();
                 input.value = selectedName;
-                (tab as any).updateHotkeyVisibility();
+                tab.updateHotkeyVisibility();
                 input.blur();
                 const old = this.plugin.app.setting.onClose;
                 this.plugin.app.setting.onClose = () => {
