@@ -1,4 +1,4 @@
-import type RepeatLastCommands from "./main.ts";
+import RepeatLastCommands from "./main.ts";
 import { App, Notice } from "obsidian";
 import type { CommandPalettePlugin } from 'obsidian-typings';
 
@@ -10,18 +10,18 @@ export function getCmdPalette(plugin: RepeatLastCommands): CommandPalettePlugin 
     return cmdPalette;
 }
 
-export function getModalCmdVars(plugin: RepeatLastCommands): { modal: any, instance: any, cmdPalette: CommandPalettePlugin } {
+export function getModalCmdVars(plugin: RepeatLastCommands): any {
     const cmdPalette = getCmdPalette(plugin);
     if (!cmdPalette) {
         new Notice("Command palette plugin not found");
         throw new Error("Command palette plugin not found");
     }
-    const instance = cmdPalette.instance;
+    const instance = cmdPalette!.instance;
     const modal = instance?.modal;
     return { modal, instance, cmdPalette };
 }
 
-export function getConditions(plugin: RepeatLastCommands): { values: any[], aliases: any, chooser: any } {
+export function getConditions(plugin: RepeatLastCommands): any {
     const { modal } = getModalCmdVars(plugin);
     const chooser = modal.chooser;
     const values = chooser.values;
@@ -29,13 +29,7 @@ export function getConditions(plugin: RepeatLastCommands): { values: any[], alia
     return { values, aliases, chooser };
 }
 
-export function aliasify(values: any[], aliases: Record<string, any>): void {
-    values.forEach((value: any) => {
-        if (value.item.id in aliases) {
-            value.item.name = aliases[value.item.id].name;
-        }
-    });
-}
+
 
 export function getCommandName(app: App, id: string): string {
     try {
@@ -49,16 +43,7 @@ export function getCommandName(app: App, id: string): string {
     return id; // Return the ID if the name is not found
 }
 
-export function getCommandIdsByNames(app: App, names: string[]): string[] {
-    const ids: string[] = [];
-    for (const key in app.commands.commands) {
-        const command = app.commands.commands[key];
-        if (names.includes(command.name)) {
-            ids.push(command.id);
-        }
-    }
-    return ids;
-}
+
 
 /**
  * Adds an [alias] at the beginning of the command. If no alias is provided, the existing alias is removed.

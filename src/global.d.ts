@@ -64,12 +64,12 @@ declare module 'obsidian-typings' {
         tabFocusContainerEl: HTMLElement;
     }
 
-    interface CommandPalettePluginInstance {
-        modal: CommandPalettePluginModal;
-        options: {
-            pinned: string[];
-        };
-        saveSettings: (plugin: any) => void;
-        recentCommands: string[];
-    }
+    // interface CommandPalettePluginInstance {
+    //     modal: CommandPaletteModal;
+    //     options: {
+    //         pinned: string[];
+    //     };
+    //     // saveSettings: (plugin: any) => void;
+    //     recentCommands: string[];
+    // }
 }

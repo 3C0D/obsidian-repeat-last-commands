@@ -2,25 +2,21 @@ export interface RLCSettings {
     maxLastCmds: number;
     notify: boolean;
     aliases: Record<string, Record<string, string>>;
-    sort: boolean;
     userExcludedIDs: string[];
     ifNoCmdOpenCmdPalette: boolean;
-    includeCmdPaletteOPen: boolean;
     includeShortcuts: boolean;
     showCmdId: boolean;
-    excludeCommands: string[];
+    excludeCommands: string[]
 }
 
-export type LastCommand = [string, string];
+export type LastCommand = string[]
 
 export const DEFAULT_SETTINGS: RLCSettings = {
-    maxLastCmds: 4,
+    maxLastCmds: 6,
     notify: true,
     aliases: {},
-    sort: true,
     userExcludedIDs: [],
     ifNoCmdOpenCmdPalette: true,
-    includeCmdPaletteOPen: false,
     includeShortcuts: true,
     showCmdId: false,
     excludeCommands: []

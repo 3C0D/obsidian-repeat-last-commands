@@ -4,18 +4,18 @@ An Obsidian plugin that enhances your workflow by allowing you to quickly repeat
 
 ## Features
 
-- **Repeat Last Command**: Quickly execute the most recently used command
-- **Repeat Last Commands**: Access your recent command history in a menu
+- **Last Command**: Quickly execute the most recently used command
+- **Last Commands modal**: Access your recent command history in a menu
 - **Command Aliases**: Create custom names for frequently used commands (manageable in settings)
 - **Command Exclusions**: Hide/show specific commands from the command palette (manageable in settings)
-- **Keyboard Shortcuts**: Quickly configure shortcuts for commands directly from the palette (customizable)
+- **Keyboard Shortcuts**: Quickly configure shortcuts for commands directly from the palette
 
 ## How to Use
 
 ### Basic Commands
 
-- **Repeat Last Command**: Execute your most recently used command
-- **Repeat Commands**: Open a modal with your command history to select from
+- **Last Command**: Execute your most recently used command
+- **Last Commands modal**: Open a modal with your command history to select from
 - **Copy Command ID**: Copy the ID of the last executed command to clipboard
 
 ### Command Aliases
@@ -26,12 +26,15 @@ An Obsidian plugin that enhances your workflow by allowing you to quickly repeat
 4. The command will now appear with your custom name in the command palette
 5. You can manage all your aliases from the plugin settings
 
-### Excluding Commands
+### Keyboard Shortcuts in Command Palette
 
-1. Open the command palette
-2. Press `Ctrl+P` (or your configured shortcut) when a command is selected
-3. The command will be hidden from the command palette
-4. To manage excluded commands, visit the plugin settings
+When the command palette is open, you can use these shortcuts:
+
+- **`Ctrl+A`**: Create an alias for the selected command
+- **`Ctrl+P`**: Pin/unpin the selected command
+- **`Ctrl+-`**: Hide the selected command from the palette
+- **`Ctrl++`**: Open modal to manage hidden commands
+- **`Ctrl+H`**: Open hotkey settings for the selected command
 
 ## Settings
 
@@ -59,7 +62,15 @@ Each setting below will appear if you have created aliases or hidden commands:
 2. Extract the zip file to your Obsidian plugins folder: `<vault>/.obsidian/plugins/`
 3. Enable the plugin in Obsidian settings
 
-## Development
+## Support
+
+If you encounter any issues or have suggestions for improvements, please [open an issue](https://github.com/3C0D/obsidian-repeat-last-commands/issues) on GitHub.
+
+## License
+
+This project is licensed under the MIT License.
+
+## Development Environment Setup
 
 ### File Structure
 
@@ -92,7 +103,6 @@ Each setting below will appear if you have created aliases or hidden commands:
 - `yarn release`: Creates a GitHub release (prompts for release title, can be multiline using `\n`)
 - `yarn lint`: Lints the project
 - `yarn lint:fix`: Fixes linting issues
-- `yarn help` or `yarn h`: Shows CLI help
 
 ### Recommended Workflow
 
@@ -104,11 +114,3 @@ Each setting below will appear if you have created aliases or hidden commands:
 ### Additional Features
 
 - **obsidian-typings**: This template automatically includes obsidian-typings, providing access to additional types not present in the official API.
-
-## Support
-
-If you encounter any issues or have suggestions for improvements, please [open an issue](https://github.com/3C0D/obsidian-repeat-last-commands/issues) on GitHub.
-
-## License
-
-This project is licensed under the MIT License.
