@@ -72,6 +72,18 @@ export class RLCSettingTab extends PluginSettingTab {
                     });
             });
 
+        new Setting(El)
+            .setName("Include commands executed via shortcuts")
+            .setDesc("Track commands executed via keyboard shortcuts and gestures (recommended)")
+            .addToggle((toggle) => {
+                toggle
+                    .setValue(this.plugin.settings.includeShortcuts)
+                    .onChange(async (value) => {
+                        this.plugin.settings.includeShortcuts = value;
+                        await this.plugin.saveSettings();
+                    });
+            });
+
         const fragment = new DocumentFragment();
         fragment.createDiv({}, div => {
             div.innerHTML = `ex: 'repeat-last-commands:repeat-command'<br>
@@ -92,17 +104,6 @@ export class RLCSettingTab extends PluginSettingTab {
             });
 
         El.createEl("h3", { text: "Command palette" });
-
-        new Setting(El)
-            .setName("Recently used commands at top of command palette")
-            .addToggle((toggle) => {
-                toggle
-                    .setValue(this.plugin.settings.sort)
-                    .onChange(async (value) => {
-                        this.plugin.settings.sort = value;
-                        await this.plugin.saveSettings();
-                    });
-            });
 
         const excluded = this.plugin.settings.excludeCommands;
         let cmdNames: string[] = [];

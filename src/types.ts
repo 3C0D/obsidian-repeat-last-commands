@@ -6,6 +6,7 @@ export interface RLCSettings {
     userExcludedIDs: string[];
     ifNoCmdOpenCmdPalette: boolean;
     includeCmdPaletteOPen: boolean;
+    includeShortcuts: boolean;
     showCmdId: boolean;
     excludeCommands: string[];
 }
@@ -20,6 +21,7 @@ export const DEFAULT_SETTINGS: RLCSettings = {
     userExcludedIDs: [],
     ifNoCmdOpenCmdPalette: true,
     includeCmdPaletteOPen: false,
+    includeShortcuts: true,
     showCmdId: false,
     excludeCommands: []
 };

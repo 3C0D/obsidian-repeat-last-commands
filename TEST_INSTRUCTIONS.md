@@ -1,27 +1,50 @@
 # Test Instructions pour Repeat Last Commands
 
-## ✅ PROBLÈMES CORRIGÉS
+## ✅ LOGIQUE ORIGINALE RESTAURÉE
 
-### 1. ✅ Settings qui s'affichent maintenant correctement
+### 🔧 **Architecture hybride restaurée :**
 
-- **Problème** : L'onglet des paramètres était vide
-- **Solution** : Restauration de la logique originale des settings avec toutes les options
-- **Test** : Aller dans Settings > Community Plugins > Repeat Last Commands > Options
+Le plugin utilise maintenant la logique originale qui fonctionnait :
 
-### 2. ✅ Détection des commandes via shortcuts et Gesture Commander
+1. **Commandes via palette** → Utilise `instance.recentCommands` d'Obsidian
+2. **Commandes via raccourcis** → Utilise `plugin.lastCommands` du plugin
+3. **Raccourcis dans la palette** → Fonctionnent via `modifyScope()`
 
-- **Problème** : Le plugin ne détectait que les commandes exécutées via la palette de commandes
-- **Solution** : Restauration de la logique originale qui distingue entre palette et raccourcis
-- **Test** :
-  1. Exécuter une commande via raccourci clavier (ex: Ctrl+O pour ouvrir un fichier)
-  2. Exécuter une commande via Gesture Commander
-  3. Utiliser "Repeat last command" - devrait répéter la dernière commande exécutée
+### ✅ **Fonctionnalités restaurées :**
 
-### 3. ✅ Exclusion de "command-palette:open"
+1. **Settings complets** - Tous les paramètres originaux affichés
+2. **Détection des raccourcis** - Via `onHKTrigger()` quand `!modal.win`
+3. **Raccourcis dans palette** - Ctrl+A, Ctrl+P, Ctrl+-, Ctrl++, Ctrl+H
+4. **Exclusions correctes** - Évite les boucles infinies
+5. **Aliases et commandes cachées** - Logique complète restaurée
 
-- **Problème** : La palette de commandes était enregistrée comme dernière commande
-- **Solution** : Exclusion automatique sauf si explicitement activée dans les settings
-- **Test** : Ouvrir la palette puis utiliser "Repeat last command" - ne devrait pas rouvrir la palette
+### 🧪 **Tests à effectuer :**
+
+1. **Commandes via palette** :
+
+   - Ouvrir palette (Ctrl+P)
+   - Sélectionner une commande → devrait être dans les récentes d'Obsidian
+
+2. **Commandes via raccourcis** :
+
+   - Utiliser un raccourci clavier → devrait être dans `plugin.lastCommands`
+   - Utiliser Gesture Commander → devrait être détecté
+
+3. **Raccourcis dans palette** :
+
+   - Ouvrir palette
+   - Sélectionner une commande
+   - Tester : Ctrl+A (alias), Ctrl+P (pin), Ctrl+- (hide), Ctrl++ (show), Ctrl+H (hotkey)
+
+4. **Repeat last command** :
+   - Devrait utiliser `instance.recentCommands[0]` (commandes via palette)
+   - Exclut automatiquement sa propre commande
+
+### 📋 **Commandes disponibles :**
+
+- `Repeat last command` : Répète la dernière commande de la palette
+- `Repeat commands` : Affiche la liste des commandes récentes du plugin
+- `Copy last command id in clipboard` : Copie l'ID de la dernière commande
 
 ## 🔧 LOGIQUE RESTAURÉE
 
