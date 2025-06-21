@@ -57,9 +57,9 @@ export class RLCSettingTab extends PluginSettingTab {
             .setDesc("Open command palette when no recent commands are available")
             .addToggle((toggle) => {
                 toggle
-                    .setValue(this.plugin.settings.ifNoCmdOpenCmdPalette)
+                    .setValue(this.plugin.settings.ifNoCmdOpenPalette)
                     .onChange(async (value) => {
-                        this.plugin.settings.ifNoCmdOpenCmdPalette = value;
+                        this.plugin.settings.ifNoCmdOpenPalette = value;
                         await this.plugin.saveSettings();
                     });
             });
@@ -81,19 +81,21 @@ export class RLCSettingTab extends PluginSettingTab {
         const fragment = new DocumentFragment();
         fragment.createDiv({}, div => {
             div.innerHTML = `ex: 'workspace:copy-path'<br>
-        Use 'Copy last command id in clipboard', in command palette, to get last command id`;
+        Use command 'Copy last command ID', to get command IDs. Paste one command per line. Commands linked to this plugin are already excluded`;
         });
 
         new Setting(containerEl)
-            .setName("Exclude commands from recent commands tracking (by ID)")
+            .setName("Excluded commands from last commands tracking")
             .setDesc(fragment)
             .addTextArea((text) => {
-                text
-                    .setValue(this.plugin.settings.userExcludedIDs.join("\n"))
-                    .onChange(async (value) => {
-                        this.plugin.settings.userExcludedIDs = value.split("\n");
-                        await this.plugin.saveSettings();
-                    });
+                const excluded = this.plugin.settings.userExcludedIDs;
+                text.setValue(excluded.join("\n"));
+                text.inputEl.onblur = async (): Promise<void> => {
+                    const textArray = text.getValue() ? text.getValue().trim().split("\n").filter(id => id.length > 0) : [];
+                    this.plugin.settings.userExcludedIDs = textArray;
+                    await this.plugin.saveSettings();
+                    this.display(); // Refresh to show updated hidden commands list
+                };
                 text.inputEl.setAttr("rows", 4);
                 text.inputEl.setAttr("cols", 50);
             });
@@ -102,7 +104,7 @@ export class RLCSettingTab extends PluginSettingTab {
 
         new Setting(containerEl)
             .setName("Excluded commands from command palette")
-            .setDesc("Enter command IDs (one per line) to hide them from the command palette. Use 'Copy last command id in clipboard' to get command IDs.")
+            .setDesc("Use command 'Copy last command ID', to get command IDs. Paste one command per line")
             .addTextArea((text) => {
                 const excluded = this.plugin.settings.excludeCommands;
                 text.setValue(excluded.join("\n"));
@@ -119,7 +121,7 @@ export class RLCSettingTab extends PluginSettingTab {
         // Aliases management button
         new Setting(containerEl)
             .setName("Manage Command Aliases")
-            .setDesc("Open a modal to view and manage command aliases")
+            .setDesc("Open a modal to view and manage existing command aliases, created from the command palette")
             .addButton((button) => {
                 button
                     .setButtonText("Manage Aliases")

@@ -52,7 +52,7 @@ export class CommandManager {
 
     // Opens command palette by default when no command is found
     private handleNoCommand(): void {
-        if (this.plugin.settings.ifNoCmdOpenCmdPalette) {
+        if (this.plugin.settings.ifNoCmdOpenPalette) {
             new Notice("No last command.\nOpening command palette...");
             setTimeout(() => {
                 this.plugin.app.commands.executeCommandById("command-palette:open");

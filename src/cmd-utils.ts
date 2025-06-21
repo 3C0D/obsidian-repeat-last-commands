@@ -1,6 +1,6 @@
 import RepeatLastCommands from "./main.ts";
-import { App, Notice } from "obsidian";
-import type { CommandPalettePlugin } from 'obsidian-typings';
+import { App, Notice, type Command, type FuzzyMatch } from "obsidian";
+import type { CommandPaletteModal, CommandPalettePlugin, CommandPalettePluginInstance, SuggestModalChooser } from 'obsidian-typings';
 
 export function getCmdPalette(plugin: RepeatLastCommands): CommandPalettePlugin | null {
     const cmdPalette = plugin.app.internalPlugins.getPluginById("command-palette");
@@ -10,18 +10,26 @@ export function getCmdPalette(plugin: RepeatLastCommands): CommandPalettePlugin 
     return cmdPalette;
 }
 
-export function getModalCmdVars(plugin: RepeatLastCommands): any {
+export function getModalCmdVars(plugin: RepeatLastCommands): {
+    modal: CommandPaletteModal,
+    instance: CommandPalettePluginInstance,
+    cmdPalette: CommandPalettePlugin
+} {
     const cmdPalette = getCmdPalette(plugin);
     if (!cmdPalette) {
         new Notice("Command palette plugin not found");
         throw new Error("Command palette plugin not found");
     }
-    const instance = cmdPalette!.instance;
-    const modal = instance?.modal;
+    const instance = cmdPalette.instance;
+    const modal = instance.modal;
     return { modal, instance, cmdPalette };
 }
 
-export function getConditions(plugin: RepeatLastCommands): any {
+export function getConditions(plugin: RepeatLastCommands): {
+    values: FuzzyMatch<Command>[] | null,
+    aliases: Record<string, Record<string, string>>,
+    chooser: SuggestModalChooser<FuzzyMatch<Command>, CommandPaletteModal>
+} {
     const { modal } = getModalCmdVars(plugin);
     const chooser = modal.chooser;
     const values = chooser.values;
@@ -50,6 +58,10 @@ export function getCommandName(app: App, id: string): string {
  */
 export async function addAlias(plugin: RepeatLastCommands, result: string, selectedItem: number): Promise<void> {
     const { values, aliases, chooser } = getConditions(plugin);
+    if (!values) {
+        new Notice("No commands available to alias.");
+        return;
+    }
     const { item } = values[selectedItem];
     const selectedId = item.id;
     const value = result?.trim() ?? "";
@@ -70,11 +82,13 @@ export async function addAlias(plugin: RepeatLastCommands, result: string, selec
         aliases[selectedId] = { name: text };
     }
 
-    chooser.values[selectedItem].item.name = text;
+    if (chooser.values) {
+        chooser.values[selectedItem].item.name = text;
+    }
 
     const { modal } = getModalCmdVars(plugin);
     await plugin.saveSettings();
-    await modal.updateSuggestions();
+    modal.updateSuggestions();
 }
 
 export async function getBackSelection(chooser: any, selectedItem: number): Promise<void> {

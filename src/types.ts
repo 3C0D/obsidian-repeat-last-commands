@@ -3,7 +3,7 @@ export interface RLCSettings {
     notify: boolean;
     aliases: Record<string, Record<string, string>>;
     userExcludedIDs: string[];
-    ifNoCmdOpenCmdPalette: boolean;
+    ifNoCmdOpenPalette: boolean;
     includeShortcuts: boolean;
     showCmdId: boolean;
     excludeCommands: string[]
@@ -16,7 +16,7 @@ export const DEFAULT_SETTINGS: RLCSettings = {
     notify: true,
     aliases: {},
     userExcludedIDs: [],
-    ifNoCmdOpenCmdPalette: true,
+    ifNoCmdOpenPalette: true,
     includeShortcuts: true,
     showCmdId: false,
     excludeCommands: []

@@ -1,7 +1,8 @@
 import type RepeatLastCommands from './main.ts';
 import { addAlias, getConditions, getModalCmdVars } from './cmd-utils.ts';
 import { AliasModal, hideCmd, ExcludedCommandsModal } from './modals.ts';
-import type { CommandPalettePlugin, CommandPalettePluginInstance, CommandPalettePluginModal, CommandScope, HotkeysSettingTab } from 'obsidian-typings';
+import type { CommandPaletteModal, CommandPalettePlugin, CommandPalettePluginInstance, HotkeysSettingTab, SuggestModalChooser } from 'obsidian-typings';
+import type { Command, FuzzyMatch, Scope } from 'obsidian';
 
 export class KeyboardManager {
     constructor(private plugin: RepeatLastCommands) {
@@ -18,7 +19,7 @@ export class KeyboardManager {
         this.registerHotkeyCommand(scope);
     }
 
-    private registerPinCommand(scope: CommandScope, modal: CommandPalettePluginModal, instance: CommandPalettePluginInstance, cmdPalette: CommandPalettePlugin | null): void {
+    private registerPinCommand(scope: Scope, modal: CommandPaletteModal, instance: CommandPalettePluginInstance, cmdPalette: CommandPalettePlugin | null): void {
         scope.keys.push({
             key: "P",
             modifiers: "Ctrl",
@@ -27,6 +28,10 @@ export class KeyboardManager {
                 const { values, chooser } = getConditions(this.plugin);
                 const selectedItem = chooser.selectedItem;
                 const selectedId = values?.[selectedItem]?.item.id;
+
+                if (!selectedId) {
+                    return;
+                }
 
                 // Toggle pinned status
                 if (selectedId && instance.options.pinned.includes(selectedId)) {
@@ -50,7 +55,7 @@ export class KeyboardManager {
         });
     }
 
-    private registerAliasCommand(scope: CommandScope): void {
+    private registerAliasCommand(scope: Scope): void {
         scope.keys.push({
             key: "A",
             modifiers: "Ctrl",
@@ -67,7 +72,7 @@ export class KeyboardManager {
         });
     }
 
-    private registerShowCommand(scope: CommandScope, modal: CommandPalettePluginModal): void {
+    private registerShowCommand(scope: Scope, modal: CommandPaletteModal): void {
         scope.keys.push({
             key: "+",
             modifiers: "Ctrl",
@@ -79,7 +84,7 @@ export class KeyboardManager {
         });
     }
 
-    private registerHideCommand(scope: CommandScope, modal: CommandPalettePluginModal): void {
+    private registerHideCommand(scope: Scope, modal: CommandPaletteModal): void {
         scope.keys.push({
             key: "-",
             modifiers: "Ctrl",
@@ -89,9 +94,14 @@ export class KeyboardManager {
                 const selectedItem = chooser.selectedItem;
 
                 // Store the ID of the next command (if it exists)
-                const nextItemId = selectedItem < values.length - 1
-                    ? values[selectedItem + 1]?.item.id
-                    : values[selectedItem]?.item.id;
+                let nextItemId: string | undefined;
+                if (values) {
+                    nextItemId = selectedItem < values.length - 1
+                        ? values[selectedItem + 1]?.item.id
+                        : values[selectedItem]?.item.id;
+                } else {
+                    nextItemId = undefined;
+                }
 
                 await hideCmd(this.plugin, selectedItem, chooser);
                 modal.close();
@@ -106,7 +116,7 @@ export class KeyboardManager {
         });
     }
 
-    private registerHotkeyCommand(scope: CommandScope): void {
+    private registerHotkeyCommand(scope: Scope): void {
         scope.keys.push({
             key: "H",
             modifiers: "Ctrl",
@@ -114,6 +124,9 @@ export class KeyboardManager {
             func: async () => {
                 const { values, chooser } = getConditions(this.plugin);
                 const selectedItem = chooser.selectedItem;
+                if (!values) {
+                    return;
+                }
                 const selectedName = values[selectedItem]?.item.name;
 
                 this.plugin.app.setting.open();
@@ -143,11 +156,13 @@ export async function getBackSelection(chooser: any, selectedItem: number): Prom
     }
 }
 
-export async function getBackSelectionById(chooser: any, values: any[], itemId: string): Promise<void> {
+export async function getBackSelectionById(chooser: SuggestModalChooser<FuzzyMatch<Command>, CommandPaletteModal>, values: FuzzyMatch<Command>[] | null, itemId: string | undefined): Promise<void> {
     try {
-        const newIndex = values.findIndex(v => v.item.id === itemId);
-        if (newIndex !== -1) {
-            chooser.forceSetSelectedItem(newIndex);
+        if (values && itemId) {
+            const newIndex = values.findIndex(v => v.item.id === itemId);
+            if (newIndex !== -1) {
+                chooser.forceSetSelectedItem(newIndex, undefined as unknown as MouseEvent | KeyboardEvent);
+            }
         }
     } catch (err) {
         console.log("Error finding item by ID:", err);

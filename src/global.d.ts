@@ -63,13 +63,4 @@ declare module 'obsidian-typings' {
         }>;
         tabFocusContainerEl: HTMLElement;
     }
-
-    // interface CommandPalettePluginInstance {
-    //     modal: CommandPaletteModal;
-    //     options: {
-    //         pinned: string[];
-    //     };
-    //     // saveSettings: (plugin: any) => void;
-    //     recentCommands: string[];
-    // }
 }

@@ -7,6 +7,11 @@ import { registerCommandFilter } from './command-filter.ts';
 import { UIManager } from './ui-manager.ts';
 import { RLCSettingTab } from './settings.ts';
 
+
+// Another way to get command ID. suggester in settings or command get command ID
+// Manage aliases find a way to show the number of aliases before to push the button or disabled button and tooltips no aliases created
+// Hidden cmds: use a modal as the modal for aliases
+
 export default class RepeatLastCommands extends Plugin {
 	settings: RLCSettings;
 	commandManager: CommandManager;
@@ -58,7 +63,7 @@ export default class RepeatLastCommands extends Plugin {
 		// Define command to copy the last command ID to clipboard
 		this.addCommand({
 			id: "get-last-command",
-			name: "Copy last command id in clipbooard",
+			name: "Copy last command ID",
 			callback: async () => {
 				await this.commandManager.copyLastCommandId();
 			},
