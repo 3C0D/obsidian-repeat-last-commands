@@ -1,6 +1,6 @@
 {
 	"name": "repeat-last-commands",
-	"version": "1.0.6",
+	"version": "1.0.8",
 	"description": "Repeat last command(s). toggle pinned command with tab. get last command id",
 	"main": "main.js",
 	"scripts": {
@@ -34,16 +34,16 @@
 		"dotenv": "^16.4.5",
 		"esbuild": "latest",
 		"eslint": "latest",
-		"eslint-import-resolver-typescript": "latest",
 		"fs-extra": "^11.2.0",
-		"jiti": "latest",
 		"monkey-around": "^3.0.0",
 		"obsidian": "*",
 		"obsidian-typings": "^3.9.5",
 		"semver": "^7.7.2",
 		"tslib": "2.4.0",
 		"tsx": "^4.19.4",
-		"typescript": "^5.8.2"
+		"typescript": "^5.8.2",
+		"eslint-import-resolver-typescript": "latest",
+		"jiti": "latest"
 	},
 	"engines": {
 		"npm": "please-use-yarn",
