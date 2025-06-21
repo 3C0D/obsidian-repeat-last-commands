@@ -8,8 +8,8 @@ export function registerCommandFilter(plugin: RepeatLastCommands): () => void {
     const { settings } = plugin;
 
     return around(plugin.app.commands.constructor.prototype, {
-        listCommands(old) {
-            return function (...args: any[]) {
+        listCommands(old: () => Command[]): () => Command[] {
+            return function (...args: unknown[]): Command[] {
                 const commands: Command[] = old.call(this, ...args);
 
                 // Filter excluded commands
@@ -18,20 +18,26 @@ export function registerCommandFilter(plugin: RepeatLastCommands): () => void {
                 );
 
                 // Apply aliases to command names
-                if (settings.aliases) {
+                if (settings.aliases && Object.keys(settings.aliases).length > 0) {
                     filteredCommands.forEach(command => {
-                        if (settings.aliases[command.id] && settings.aliases[command.id].name) {
-                            command.name = settings.aliases[command.id].name;
+                        const alias = settings.aliases[command.id];
+                        if (alias?.name) {
+                            command.name = alias.name;
                         }
                     });
                 }
 
-                const { instance } = getModalCmdVars(this);
-
-                // Filter out plugin commands and user excluded commands from recent commands
-                instance.recentCommands = instance.recentCommands.filter((id: string) => {
-                    return !shouldExcludeCommand(settings, id);
-                });
+                try {
+                    const { instance } = getModalCmdVars(this);
+                    // Filter out plugin commands and user excluded commands from recent commands 
+                    if (instance.recentCommands) {
+                        instance.recentCommands = instance.recentCommands.filter((id: string) =>
+                            !shouldExcludeCommand(settings, id)
+                        );
+                    }
+                } catch (error) {
+                    console.debug('Command palette not available', error);
+                }
 
                 return filteredCommands;
             };
