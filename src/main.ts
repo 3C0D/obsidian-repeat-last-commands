@@ -1,65 +1,85 @@
-import { Plugin } from 'obsidian';
-import { type RLCSettings, DEFAULT_SETTINGS } from "./types.ts";
+import { Notice, Plugin, type Command } from 'obsidian';
+import { around } from 'monkey-around';
 import { onCommandTrigger } from './palette.ts';
-import { CommandManager } from './command-manager.ts';
-import { KeyboardManager } from './keyboard-manager.ts';
-import { registerCommandFilter } from './command-filter.ts';
-import { UIManager } from './ui-manager.ts';
 import { RLCSettingTab } from './settings.ts';
+import { LastCommandsModal } from './modals.ts';
+import { getCommandName } from './cmd-utils.ts';
+import { DEFAULT_SETTINGS, type RLCSettings } from './types.ts';
 
 export default class RepeatLastCommands extends Plugin {
 	settings!: RLCSettings;
-	commandManager!: CommandManager;
-	keyboardManager!: KeyboardManager;
-	uiManager!: UIManager;
+	lastCommand: string | null = null;
+	lastCommands: string[] = [];
+	infoDiv: HTMLDivElement | null = null;
 
 	async onload(): Promise<void> {
-		// Load user settings from storage
 		await this.loadSettings();
 		this.addSettingTab(new RLCSettingTab(this));
 
-		// Initialize the command manager that centralizes recent commands execution logic
-		this.commandManager = new CommandManager(this);
+		const { settings } = this;
+		this.register(around(this.app.commands.constructor.prototype, {
+			listCommands(old) {
+				// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+				return function (...args: any[]) {
+					const commands: Command[] = old.call(this, ...args);
+					return commands.filter((command) => !settings.excludeCommands.includes(command.id));
+				};
+			}
+		}));
 
-		// Initialize the keyboard manager for command palette shortcuts
-		this.keyboardManager = new KeyboardManager(this);
-
-		// Initialize the UI manager for interface elements
-		this.uiManager = new UIManager(this);
-
-		// Register filter that modifies command display (aliases, exclusions)
-		this.register(registerCommandFilter(this));
-
-		// Monitor command palette opening to add additional information
 		this.register(onCommandTrigger(this));
 
-		// Configure specific keyboard shortcuts in the command palette (Ctrl+A, Ctrl+P, etc.)
-		this.keyboardManager.registerKeyBindings();
+		const text = this.settings.ifNoCmdOpenCmdPalette ? "No last command.\nopening command palette..." : "No last command";
 
-		// Define command to repeat the last executed command
 		this.addCommand({
 			id: "repeat-last-command",
 			name: "Repeat last command",
-			editorCallback: async () => {
-				await this.commandManager.executeLastCommand();
-			}
+			callback: async () => {
+				if (this.lastCommand) {
+					if (this.settings.notify) {
+						new Notice(`Repeated: ${getCommandName(this.app, this.lastCommand)}`);
+					}
+					console.log("this.lastCommand", this.lastCommand);
+					this.app.commands.executeCommandById(this.lastCommand);
+				} else {
+					new Notice(text, 2500);
+					if (this.settings.ifNoCmdOpenCmdPalette) {
+						setTimeout(() => {
+							this.app.commands.executeCommandById("command-palette:open");
+						}, 400);
+					}
+				}
+			},
 		});
 
-		// Define command to display and choose from recent commands
 		this.addCommand({
 			id: "repeat-commands",
 			name: "Repeat commands",
 			callback: async () => {
-				await this.commandManager.showCommandsList();
+				if (this.lastCommands.length) {
+					new LastCommandsModal(this).open();
+				} else {
+					new Notice(text, 2500);
+					if (this.settings.ifNoCmdOpenCmdPalette) {
+						setTimeout(() => {
+							this.app.commands.executeCommandById("command-palette:open");
+						}, 400);
+					}
+				}
 			},
 		});
 
-		// Define command to copy the last command ID to clipboard
 		this.addCommand({
 			id: "get-last-command",
 			name: "Copy last command id in clipbooard",
 			callback: async () => {
-				await this.commandManager.copyLastCommandId();
+				if (this.lastCommand) {
+					navigator.clipboard.writeText(this.lastCommand).then(() => {
+						new Notice("Command id copied in clipboard");
+					}).catch(err => { console.error(err); });
+				} else {
+					new Notice("No last command");
+				}
 			},
 		});
 	}
@@ -70,26 +90,5 @@ export default class RepeatLastCommands extends Plugin {
 
 	async saveSettings(): Promise<void> {
 		await this.saveData(this.settings);
-	}
-
-	onunload(): void {
-		// Remove all aliases when plugin is disabled
-		this.removeAllAliases();
-	}
-
-	removeAllAliases(): void {
-		// Get all commands
-		const commands = this.app.commands.commands;
-
-		// For each command that has an alias in our settings
-		Object.keys(this.settings.aliases).forEach(commandId => {
-			const command = commands[commandId];
-			if (command) {
-				// Find the original command name (without our alias)
-				const originalName = command.name.replace(/^\[.*?\]\s*/, '');
-				// Reset to original name
-				command.name = originalName;
-			}
-		});
 	}
 }

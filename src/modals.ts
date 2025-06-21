@@ -1,6 +1,6 @@
 import { App, Modal, Scope, Setting, SuggestModal, TextComponent } from "obsidian";
 import type RepeatLastCommands from "./main.ts";
-import { getCommandIdsByNames, getCommandName, getConditions, getModalCmdVars } from "./cmd-utils.ts";
+import { getCommandIdsByNames, getCommandName, getConditions } from "./cmd-utils.ts";
 import type { LastCommand } from "./types.ts";
 
 export class LastCommandsModal extends SuggestModal<LastCommand> {
@@ -9,10 +9,9 @@ export class LastCommandsModal extends SuggestModal<LastCommand> {
     }
 
     getSuggestions(query: string): LastCommand[] {
-        const { instance } = getModalCmdVars(this.plugin);
-        // list of last command id used
-        const lastCommands = instance.recentCommands;
-        let lastCommandsArr: LastCommand[] = lastCommands.map((id: string): LastCommand => {
+        // Use the plugin's lastCommands array
+        const lastCommands = this.plugin.lastCommands;
+        let lastCommandsArr: LastCommand[] = lastCommands.map((id: string) => {
             try {
                 const command = this.plugin.app.commands.commands[id];
                 const name = command ? command.name : id;
@@ -47,16 +46,8 @@ export class LastCommandsModal extends SuggestModal<LastCommand> {
     onChooseSuggestion(cmd: LastCommand): void {
         const commandId = cmd[0];
         // Execute the selected command directly
+        // Our monkey-around patch will automatically track this command
         this.plugin.app.commands.executeCommandById(commandId);
-
-        const { instance } = getModalCmdVars(this.plugin);
-        // Remove the command if it already exists in the list of recent commands
-        const index = instance.recentCommands.indexOf(commandId);
-        if (index > -1) {
-            instance.recentCommands.splice(index, 1);
-        }
-        // Add the command at the end of the list
-        instance.recentCommands.push(commandId);
     }
 }
 
