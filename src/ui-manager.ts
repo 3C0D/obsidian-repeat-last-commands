@@ -1,16 +1,16 @@
-import type RepeatLastCommands from './main';
-import { getModalCmdVars } from './cmd-utils';
+import type RepeatLastCommands from './main.ts';
+import { getModalCmdVars } from './cmd-utils.ts';
 
 /**
  * Manages UI-related functionality for the plugin
  */
 export class UIManager {
     private plugin: RepeatLastCommands;
-    
+
     constructor(plugin: RepeatLastCommands) {
         this.plugin = plugin;
     }
-    
+
     /**
      * Adds information text below the command palette
      */

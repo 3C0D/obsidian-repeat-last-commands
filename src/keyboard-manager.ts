@@ -1,6 +1,6 @@
-import type RepeatLastCommands from './main';
-import { addAlias, getConditions, getModalCmdVars } from './cmd-utils';
-import { AliasModal, hideCmd, ShowAgainCmds } from './modals';
+import type RepeatLastCommands from './main.ts';
+import { addAlias, getConditions, getModalCmdVars } from './cmd-utils.ts';
+import { AliasModal, hideCmd, ShowAgainCmds } from './modals.ts';
 import type { CommandPalettePlugin, CommandPalettePluginInstance, CommandPalettePluginModal, CommandScope, HotkeysSettingTab } from 'obsidian-typings';
 
 export class KeyboardManager {
@@ -23,7 +23,7 @@ export class KeyboardManager {
             key: "P",
             modifiers: "Ctrl",
             scope: scope.keys[0].scope,
-            func: async () => {
+            func: async (): Promise<void> => {
                 const { values, chooser } = getConditions(this.plugin);
                 const selectedItem = chooser.selectedItem;
                 const selectedId = values[selectedItem]?.item.id;
@@ -36,7 +36,9 @@ export class KeyboardManager {
                 }
 
                 // Save using the plugin's command palette instance
-                instance.saveSettings(cmdPalette);
+                if (cmdPalette) {
+                    instance.saveSettings(cmdPalette);
+                }
 
                 // Update view
                 modal.close();
@@ -53,14 +55,13 @@ export class KeyboardManager {
             key: "A",
             modifiers: "Ctrl",
             scope: scope.keys[0].scope,
-            func: () => {
+            func: (): void => {
                 const { chooser } = getConditions(this.plugin);
                 const selectedItem = chooser.selectedItem;
 
                 new AliasModal(this.plugin.app, this.plugin, selectedItem, async (result) => {
                     await addAlias(this.plugin, result, selectedItem);
-                    await getBackSelection(chooser, selectedItem);
-                }).open();
+                });
             }
         });
     }
@@ -70,7 +71,7 @@ export class KeyboardManager {
             key: "+",
             modifiers: "Ctrl",
             scope: scope.keys[0].scope,
-            func: () => {
+            func: (): void => {
                 new ShowAgainCmds(this.plugin.app, this.plugin, modal).open();
             }
         });
@@ -81,7 +82,7 @@ export class KeyboardManager {
             key: "-",
             modifiers: "Ctrl",
             scope: scope.keys[0].scope,
-            func: async () => {
+            func: async (): Promise<void> => {
                 const { values, chooser } = getConditions(this.plugin);
                 const selectedItem = chooser.selectedItem;
 
@@ -108,7 +109,7 @@ export class KeyboardManager {
             key: "H",
             modifiers: "Ctrl",
             scope: scope.keys[0].scope,
-            func: async () => {
+            func: async (): Promise<void> => {
                 const { values, chooser } = getConditions(this.plugin);
                 const selectedItem = chooser.selectedItem;
                 const selectedName = values[selectedItem]?.item.name;
@@ -123,7 +124,7 @@ export class KeyboardManager {
                 tab.updateHotkeyVisibility();
                 input.blur();
                 const old = this.plugin.app.setting.onClose;
-                this.plugin.app.setting.onClose = () => {
+                this.plugin.app.setting.onClose = (): void => {
                     this.plugin.app.commands.executeCommandById("command-palette:open");
                     this.plugin.app.setting.onClose = old;
                 };
@@ -132,7 +133,7 @@ export class KeyboardManager {
     }
 }
 
-export async function getBackSelection(chooser: any, selectedItem: number) {
+export async function getBackSelection(chooser: any, selectedItem: number): Promise<void> {
     try {
         chooser.forceSetSelectedItem(selectedItem);
     } catch (err) {
@@ -140,9 +141,9 @@ export async function getBackSelection(chooser: any, selectedItem: number) {
     }
 }
 
-export async function getBackSelectionById(chooser: any, values: any[], itemId: string) {
+export async function getBackSelectionById(chooser: any, values: any[], itemId: string): Promise<void> {
     try {
-        const newIndex = values.findIndex(v => v.item.id === itemId);
+        const newIndex = values.findIndex((v: any) => v.item.id === itemId);
         if (newIndex !== -1) {
             chooser.forceSetSelectedItem(newIndex);
         }

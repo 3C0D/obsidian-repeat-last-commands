@@ -1,13 +1,12 @@
 import type { Command } from "obsidian";
-import type RepeatLastCommands from "./main";
+import type RepeatLastCommands from "./main.ts";
 import { around } from "monkey-around";
-import type { RLCSettings } from "./types";
+import type { RLCSettings } from "./types.ts";
 
-
-export function onCommandTrigger(plugin: RepeatLastCommands) {
+export function onCommandTrigger(plugin: RepeatLastCommands): any {
     return around(plugin.app.commands, {
         executeCommand(originalMethod) {
-            return function (...args: Command[]) {
+            return function (...args: Command[]): any {
                 if (args[0].id === "command-palette:open") {
                     plugin.uiManager.addInfoToPalette();
                 }
@@ -18,7 +17,7 @@ export function onCommandTrigger(plugin: RepeatLastCommands) {
     });
 }
 
-export function shouldExcludeCommand(settings: RLCSettings, commandId: string) {
+export function shouldExcludeCommand(settings: RLCSettings, commandId: string): boolean {
     return (
         commandId === "repeat-last-commands:repeat-last-command" ||
         commandId === "repeat-last-commands:repeat-commands" ||

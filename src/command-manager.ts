@@ -1,7 +1,7 @@
 import { Notice } from 'obsidian';
-import type RepeatLastCommands from './main';
-import { getModalCmdVars } from './cmd-utils';
-import { LastCommandsModal } from './modals';
+import type RepeatLastCommands from './main.ts';
+import { getModalCmdVars } from './cmd-utils.ts';
+import { LastCommandsModal } from './modals.ts';
 import type { CommandPalettePluginInstance } from 'obsidian-typings';
 
 export class CommandManager {

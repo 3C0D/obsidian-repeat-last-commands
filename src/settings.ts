@@ -1,6 +1,6 @@
 import { PluginSettingTab, Setting } from "obsidian";
-import type RepeatLastCommands from "./main";
-import { getCommandName } from "./cmd-utils";
+import type RepeatLastCommands from "./main.ts";
+import { getCommandName } from "./cmd-utils.ts";
 
 export class RLCSettingTab extends PluginSettingTab {
     constructor(public plugin: RepeatLastCommands) {
@@ -20,9 +20,10 @@ export class RLCSettingTab extends PluginSettingTab {
 
             const aliasesList = containerEl.createEl('div', { cls: 'aliases-list' });
 
-            Object.entries(this.plugin.settings.aliases).forEach(([commandId, aliasData]) => {
+            Object.entries(this.plugin.settings.aliases).forEach(([commandId, aliasDataRaw]) => {
+                const aliasData = aliasDataRaw as { name: string };
                 const originalName = aliasData.name.replace(/^\[.*?\]\s*/, '');
-                
+
                 new Setting(aliasesList)
                     .setName(aliasData.name)
                     .setDesc(`Original: ${originalName}`)
@@ -33,13 +34,13 @@ export class RLCSettingTab extends PluginSettingTab {
                             .onClick(async () => {
                                 // Remove the alias from settings
                                 delete this.plugin.settings.aliases[commandId];
-                                
+
                                 // Update the command name in the app
                                 const command = this.plugin.app.commands.commands[commandId];
                                 if (command) {
                                     command.name = originalName;
                                 }
-                                
+
                                 await this.plugin.saveSettings();
                                 this.display();
                             });
@@ -58,18 +59,15 @@ export class RLCSettingTab extends PluginSettingTab {
 
             this.plugin.settings.excludeCommands.forEach((commandId: string) => {
                 // Fix: Pass the plugin.app to getCommandName instead of using call
-                const commandName = getCommandName(this.plugin.app, commandId);
-                
+                const name = getCommandName(this.plugin.app, commandId);
                 new Setting(hiddenCommandsList)
-                    .setName(commandName || commandId)
+                    .setName(name)
                     .addButton((button) => {
                         button
                             .setIcon('trash')
-                            .setTooltip('Restore this command')
+                            .setTooltip('Unhide this command')
                             .onClick(async () => {
-                                this.plugin.settings.excludeCommands = this.plugin.settings.excludeCommands.filter(
-                                    (id: string) => id !== commandId
-                                );
+                                this.plugin.settings.excludeCommands = this.plugin.settings.excludeCommands.filter((id: string) => id !== commandId);
                                 await this.plugin.saveSettings();
                                 this.display();
                             });

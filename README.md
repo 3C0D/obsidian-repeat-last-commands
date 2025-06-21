@@ -8,7 +8,7 @@ An Obsidian plugin that enhances your workflow by allowing you to quickly repeat
 - **Repeat Last Commands**: Access your recent command history in a menu
 - **Command Aliases**: Create custom names for frequently used commands (manageable in settings)
 - **Command Exclusions**: Hide/show specific commands from the command palette (manageable in settings)
-- **Keyboard Shortcuts**: Quickly configure shortcuts for commands directly from the palette
+- **Keyboard Shortcuts**: Quickly configure shortcuts for commands directly from the palette (customizable)
 
 ## How to Use
 
@@ -38,6 +38,7 @@ An Obsidian plugin that enhances your workflow by allowing you to quickly repeat
 Each setting below will appear if you have created aliases or hidden commands:
 
 - **Command Aliases**: View and manage your custom command aliases
+
   - Shows commands with custom names you've created
   - You can remove aliases to restore original command names
 
@@ -58,15 +59,7 @@ Each setting below will appear if you have created aliases or hidden commands:
 2. Extract the zip file to your Obsidian plugins folder: `<vault>/.obsidian/plugins/`
 3. Enable the plugin in Obsidian settings
 
-## Support
-
-If you encounter any issues or have suggestions for improvements, please [open an issue](https://github.com/3C0D/obsidian-repeat-last-commands/issues) on GitHub.
-
-## License
-
-This project is licensed under the MIT License.
-
-## Development Environment Setup
+## Development
 
 ### File Structure
 
@@ -78,6 +71,7 @@ This project is licensed under the MIT License.
 0. **First install yarn:** `npm install -g yarn`
 
 1. **Inside the vault's plugins folder:**
+
    - Delete the `.env` file or put empty paths.
 
 2. **From another folder:**
@@ -98,6 +92,7 @@ This project is licensed under the MIT License.
 - `yarn release`: Creates a GitHub release (prompts for release title, can be multiline using `\n`)
 - `yarn lint`: Lints the project
 - `yarn lint:fix`: Fixes linting issues
+- `yarn help` or `yarn h`: Shows CLI help
 
 ### Recommended Workflow
 
@@ -109,3 +104,11 @@ This project is licensed under the MIT License.
 ### Additional Features
 
 - **obsidian-typings**: This template automatically includes obsidian-typings, providing access to additional types not present in the official API.
+
+## Support
+
+If you encounter any issues or have suggestions for improvements, please [open an issue](https://github.com/3C0D/obsidian-repeat-last-commands/issues) on GitHub.
+
+## License
+
+This project is licensed under the MIT License.

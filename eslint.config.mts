@@ -7,6 +7,9 @@ import type {
 
 const configs: Linter.Config[] = [
   {
+    ignores: ["eslint.config.mts"]
+  },
+  {
     files: ["**/*.ts"],
     ignores: [
       "dist/**",
@@ -31,11 +34,11 @@ const configs: Linter.Config[] = [
       "@typescript-eslint/ban-ts-comment": "off",
       "no-prototype-builtins": "off",
       "@typescript-eslint/no-empty-function": "off",
-      
+
       // Useful rules but not too strict
       "semi": "error",
       "@typescript-eslint/explicit-function-return-type": "warn",
-      
+
       // Disable overly strict rules
       "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/no-unsafe-call": "off",

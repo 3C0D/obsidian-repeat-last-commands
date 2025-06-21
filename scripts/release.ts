@@ -1,9 +1,14 @@
-import { writeFile,
-  stat } from "fs/promises";
+import {
+  writeFile,
+  stat
+} from "fs/promises";
 import { execSync } from "child_process";
 import dedent from "dedent";
-import { askQuestion,
-  createReadlineInterface } from "./utils";
+import {
+  askConfirmation,
+  createReadlineInterface,
+  ensureGitSync
+} from "./utils.js";
 
 const rl = createReadlineInterface();
 
@@ -24,11 +29,13 @@ async function createReleaseNotesFile(tagMessage: string, tag: string): Promise<
 }
 
 async function handleExistingTag(tag: string): Promise<boolean> {
-  const answer = await askQuestion(`Tag ${tag} already exists. Do you want to replace it? (Yes/No): `, rl);
-  if (answer.toLowerCase() !== "yes" && answer.toLowerCase() !== "y") {
+  const confirmed = await askConfirmation(`Tag ${tag} already exists. Do you want to replace it?`, rl);
+
+  if (!confirmed) {
     console.log("Operation aborted");
     return false;
   }
+
   execSync(`git tag -d ${tag}`);
   execSync(`git push origin :refs/tags/${tag}`);
   console.log(`Deleted existing tag ${tag} locally and remotely.`);
@@ -65,10 +72,14 @@ async function doNextSteps(message: string, tag: string): Promise<void> {
   const tagMessage = messages.map(m => `-m "${m}"`).join(" ");
 
   try {
-    execSync(`git add ${body}`);
+    execSync("git add -A");
     execSync("git commit -m \"update tag description\"");
+
+    // Ensure Git is synchronized before pushing
+    await ensureGitSync();
+
     execSync("git push");
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error:", error.message);
   }
   try {
@@ -79,10 +90,13 @@ async function doNextSteps(message: string, tag: string): Promise<void> {
     console.log("Fixed");
     execSync(`git tag -a ${tag} ${tagMessage}`);
   }
+  // Ensure Git is synchronized before pushing tag
+  await ensureGitSync();
+
   execSync(`git push origin ${tag}`);
   console.log(`Release ${tag} pushed to repo.`);
   console.log(dedent`
-        with message: 
+        with message:
             ${toShow}
     `);
 }

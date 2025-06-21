@@ -1,20 +1,19 @@
 import { Plugin } from 'obsidian';
-import { type RLCSettings, DEFAULT_SETTINGS } from "./types";
-import { onCommandTrigger } from './palette';
-import { CommandManager } from './command-manager';
-import { KeyboardManager } from './keyboard-manager';
-import { registerCommandFilter } from './command-filter';
-import { UIManager } from './ui-manager';
-import { RLCSettingTab } from './settings';
+import { type RLCSettings, DEFAULT_SETTINGS } from "./types.ts";
+import { onCommandTrigger } from './palette.ts';
+import { CommandManager } from './command-manager.ts';
+import { KeyboardManager } from './keyboard-manager.ts';
+import { registerCommandFilter } from './command-filter.ts';
+import { UIManager } from './ui-manager.ts';
+import { RLCSettingTab } from './settings.ts';
 
 export default class RepeatLastCommands extends Plugin {
-	settings: RLCSettings;
-	commandManager: CommandManager;
-	keyboardManager: KeyboardManager;
-	uiManager: UIManager;
+	settings!: RLCSettings;
+	commandManager!: CommandManager;
+	keyboardManager!: KeyboardManager;
+	uiManager!: UIManager;
 
-
-	async onload() {
+	async onload(): Promise<void> {
 		// Load user settings from storage
 		await this.loadSettings();
 		this.addSettingTab(new RLCSettingTab(this));
@@ -65,20 +64,20 @@ export default class RepeatLastCommands extends Plugin {
 		});
 	}
 
-	async loadSettings() {
+	async loadSettings(): Promise<void> {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
 	}
 
-	async saveSettings() {
+	async saveSettings(): Promise<void> {
 		await this.saveData(this.settings);
 	}
 
-	onunload() {
+	onunload(): void {
 		// Remove all aliases when plugin is disabled
 		this.removeAllAliases();
 	}
 
-	removeAllAliases() {
+	removeAllAliases(): void {
 		// Get all commands
 		const commands = this.app.commands.commands;
 

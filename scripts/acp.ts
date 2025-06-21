@@ -1,17 +1,38 @@
 import { execSync } from "child_process";
-import { askQuestion,
+import fs from "fs";
+import path from "path";
+import {
+  askQuestion,
   cleanInput,
   createReadlineInterface,
-  gitExec } from "./utils";
+  gitExec,
+  ensureGitSync
+} from "./utils.js";
 
 const rl = createReadlineInterface();
+
+// Check if we're in the centralized config repo
+function isInCentralizedRepo(): boolean {
+  const packageJsonPath = path.join(process.cwd(), "package.json");
+  if (!fs.existsSync(packageJsonPath)) return false;
+
+  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+  return packageJson.name === "obsidian-plugin-config";
+}
 
 async function main(): Promise<void> {
   try {
     if (process.argv.includes("-b")) {
       console.log("Building...");
-      gitExec("npm run build");
+      gitExec("yarn build");
       console.log("Build successful.");
+    }
+
+    // Only update exports if we're in the centralized repo and not explicitly disabled
+    if (!process.argv.includes("-ne") && !process.argv.includes("--no-exports") && isInCentralizedRepo()) {
+      console.log("Updating exports...");
+      gitExec("yarn run update-exports");
+      console.log("Exports updated.");
     }
 
     const input: string = await askQuestion("Enter commit message: ", rl);
@@ -28,6 +49,9 @@ async function main(): Promise<void> {
 
     // get current branch name
     const currentBranch = execSync("git rev-parse --abbrev-ref HEAD").toString().trim();
+
+    // Ensure Git is synchronized before pushing
+    await ensureGitSync();
 
     try {
       gitExec(`git push origin ${currentBranch}`);

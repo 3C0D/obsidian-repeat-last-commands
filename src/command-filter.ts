@@ -1,19 +1,19 @@
 import { type Command } from 'obsidian';
 import { around } from 'monkey-around';
-import type RepeatLastCommands from './main';
-import { getModalCmdVars } from './cmd-utils';
-import { shouldExcludeCommand } from './palette';
+import type RepeatLastCommands from './main.ts';
+import { getModalCmdVars } from './cmd-utils.ts';
+import { shouldExcludeCommand } from './palette.ts';
 
-export function registerCommandFilter(plugin: RepeatLastCommands) {
+export function registerCommandFilter(plugin: RepeatLastCommands): any {
     const { settings } = plugin;
-    
+
     return around(plugin.app.commands.constructor.prototype, {
         listCommands(old) {
-            return function (...args: any[]) {
+            return function (...args: any[]): Command[] {
                 const commands: Command[] = old.call(this, ...args);
 
                 // Filter excluded commands
-                const filteredCommands = commands.filter((command) => 
+                const filteredCommands = commands.filter((command) =>
                     !settings.excludeCommands.includes(command.id)
                 );
 
@@ -29,7 +29,7 @@ export function registerCommandFilter(plugin: RepeatLastCommands) {
                 const { instance } = getModalCmdVars(this);
 
                 // Filter out plugin commands and user excluded commands from recent commands
-                instance.recentCommands = instance.recentCommands.filter(id => {
+                instance.recentCommands = instance.recentCommands.filter((id: string) => {
                     return !shouldExcludeCommand(settings, id);
                 });
 

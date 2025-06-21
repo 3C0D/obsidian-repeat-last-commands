@@ -1,7 +1,7 @@
 import { App, Modal, Scope, Setting, SuggestModal, TextComponent } from "obsidian";
-import RepeatLastCommands from "./main";
-import { getCommandIdsByNames, getCommandName, getConditions, getModalCmdVars } from "./cmd-utils";
-import type { LastCommand } from "./types";
+import type RepeatLastCommands from "./main.ts";
+import { getCommandIdsByNames, getCommandName, getConditions, getModalCmdVars } from "./cmd-utils.ts";
+import type { LastCommand } from "./types.ts";
 
 export class LastCommandsModal extends SuggestModal<LastCommand> {
     constructor(public plugin: RepeatLastCommands) {
@@ -9,25 +9,25 @@ export class LastCommandsModal extends SuggestModal<LastCommand> {
     }
 
     getSuggestions(query: string): LastCommand[] {
-        const { instance } = getModalCmdVars(this.plugin)
+        const { instance } = getModalCmdVars(this.plugin);
         // list of last command id used
         const lastCommands = instance.recentCommands;
-        let lastCommandsArr = lastCommands.map(id => {
+        let lastCommandsArr: LastCommand[] = lastCommands.map((id: string): LastCommand => {
             try {
                 const command = this.plugin.app.commands.commands[id];
                 const name = command ? command.name : id;
                 return [id, name];
-            } catch (error) {
+            } catch {
                 return [id, id];
             }
         });
 
         return lastCommandsArr.filter(cmd =>
             cmd[1].toLowerCase().includes(query.toLowerCase())
-        );        
+        );
     }
 
-    renderSuggestion(cmd: LastCommand, el: HTMLElement) {
+    renderSuggestion(cmd: LastCommand, el: HTMLElement): void {
         if (cmd[1].includes(":")) {
             const [name, command] = cmd[1].toString().split(":");
             el.createEl("div", {
@@ -44,12 +44,12 @@ export class LastCommandsModal extends SuggestModal<LastCommand> {
             el.createEl("div", { text: `${cmd[0]}`, cls: "id-suggest" });
     }
 
-    onChooseSuggestion(cmd: LastCommand) {
-        const commandId = cmd[0];        
+    onChooseSuggestion(cmd: LastCommand): void {
+        const commandId = cmd[0];
         // Execute the selected command directly
-        this.plugin.app.commands.executeCommandById(commandId);        
+        this.plugin.app.commands.executeCommandById(commandId);
 
-        const { instance } = getModalCmdVars(this.plugin);        
+        const { instance } = getModalCmdVars(this.plugin);
         // Remove the command if it already exists in the list of recent commands
         const index = instance.recentCommands.indexOf(commandId);
         if (index > -1) {
@@ -75,11 +75,11 @@ export class AliasModal extends Modal {
         }
     }
 
-    onOpen() {
+    onOpen(): void {
         const { contentEl } = this;
         contentEl.empty();
-        const { chooser } = getConditions(this.plugin)
-        let name = chooser.values[this.selectedItem].item.name
+        const { chooser } = getConditions(this.plugin);
+        let name = chooser.values[this.selectedItem].item.name;
         this.titleEl.setText(`Define an alias`);
         contentEl.setText(`for: "${name}"`);
 
@@ -88,10 +88,10 @@ export class AliasModal extends Modal {
             .setPlaceholder('Enter alias text here')
             .onChange(async (value) => {
                 this.result = value;
-            })
-        const eL = input.inputEl
-        eL.addClass('alias-input')
-        eL.size = 42
+            });
+        const eL = input.inputEl;
+        eL.addClass('alias-input');
+        eL.size = 42;
 
         // Add a more visually integrated help text
         contentEl.createEl('div', {
@@ -113,7 +113,7 @@ export class AliasModal extends Modal {
                     }));
     }
 
-    onClose() {
+    onClose(): void {
         const { contentEl } = this;
         contentEl.empty();
     }
@@ -127,35 +127,35 @@ export class ShowAgainCmds extends Modal {
             this.modalEl.style.width = `${this.width}px`;
         }
     }
-    onOpen() {
+    onOpen(): void {
         const { contentEl } = this;
         contentEl.empty();
-        const excluded = this.plugin.settings.excludeCommands
-        let cmdNames: string[] = []
+        const excluded = this.plugin.settings.excludeCommands;
+        let cmdNames: string[] = [];
         for (const id of excluded) {
-            cmdNames.push(getCommandName(this.plugin.app, id))
+            cmdNames.push(getCommandName(this.plugin.app, id));
         }
         new Setting(contentEl)
             .setName("Excluded commands from command palette")
             .addTextArea((text) => {
                 text
-                    .setValue(cmdNames.join("\n"))
-                text.inputEl.onblur = async () => {
-                    const textArray = text.getValue() ? text.getValue().trim().split("\n") : []
-                    const ids = getCommandIdsByNames(textArray)
-                    this.plugin.settings.excludeCommands = ids
+                    .setValue(cmdNames.join("\n"));
+                text.inputEl.onblur = async (): Promise<void> => {
+                    const textArray = text.getValue() ? text.getValue().trim().split("\n") : [];
+                    const ids = getCommandIdsByNames(this.plugin.app, textArray);
+                    this.plugin.settings.excludeCommands = ids;
                     await this.plugin.saveSettings();
-                    this.close()
-                    this.modal.close()
-                    this.plugin.app.commands.executeCommandById("command-palette:open")
-                }
-                text.inputEl.setAttr("rows", 4)
-                text.inputEl.setAttr("cols", 40)
-            })
+                    this.close();
+                    this.modal.close();
+                    this.plugin.app.commands.executeCommandById("command-palette:open");
+                };
+                text.inputEl.setAttr("rows", 4);
+                text.inputEl.setAttr("cols", 40);
+            });
     }
 }
 
-export async function hideCmd(plugin: RepeatLastCommands, selectedItem: number, chooser: any) {
+export async function hideCmd(plugin: RepeatLastCommands, selectedItem: number, chooser: any): Promise<void> {
     const id = chooser.values[selectedItem].item.id;
 
     if (!plugin.settings.excludeCommands.includes(id)) {
