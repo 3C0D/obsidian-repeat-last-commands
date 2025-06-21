@@ -1,6 +1,6 @@
 {
 	"name": "repeat-last-commands",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"description": "Repeat last command(s). toggle pinned command with tab. get last command id",
 	"main": "main.js",
 	"scripts": {
