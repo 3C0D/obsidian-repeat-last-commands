@@ -1,12 +1,11 @@
-import { Plugin } from 'obsidian';
+import { Plugin } from "obsidian";
 import { type RLCSettings, DEFAULT_SETTINGS } from "./types.ts";
-import { onCommandTrigger } from './palette.ts';
-import { CommandManager } from './command-manager.ts';
-import { KeyboardManager } from './keyboard-manager.ts';
-import { registerCommandFilter } from './command-filter.ts';
-import { UIManager } from './ui-manager.ts';
-import { RLCSettingTab } from './settings.ts';
-
+import { onCommandTrigger } from "./palette.ts";
+import { CommandManager } from "./command-manager.ts";
+import { KeyboardManager } from "./keyboard-manager.ts";
+import { registerCommandFilter } from "./command-filter.ts";
+import { UIManager } from "./ui-manager.ts";
+import { RLCSettingTab } from "./settings.ts";
 
 // Another way to get command ID. suggester in settings or command get command ID
 // Manage aliases find a way to show the number of aliases before to push the button or disabled button and tooltips no aliases created
@@ -17,7 +16,6 @@ export default class RepeatLastCommands extends Plugin {
 	commandManager: CommandManager;
 	keyboardManager: KeyboardManager;
 	uiManager: UIManager;
-
 
 	async onload(): Promise<void> {
 		// Load user settings from storage
@@ -48,7 +46,7 @@ export default class RepeatLastCommands extends Plugin {
 			name: "Last command",
 			callback: async () => {
 				await this.commandManager.executeLastCommand();
-			}
+			},
 		});
 
 		// Define command to display and choose from recent commands
@@ -71,7 +69,11 @@ export default class RepeatLastCommands extends Plugin {
 	}
 
 	async loadSettings(): Promise<void> {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+		this.settings = Object.assign(
+			{},
+			DEFAULT_SETTINGS,
+			await this.loadData(),
+		);
 	}
 
 	async saveSettings(): Promise<void> {
@@ -88,11 +90,11 @@ export default class RepeatLastCommands extends Plugin {
 		const commands = this.app.commands.commands;
 
 		// For each command that has an alias in our settings
-		Object.keys(this.settings.aliases).forEach(commandId => {
+		Object.keys(this.settings.aliases).forEach((commandId) => {
 			const command = commands[commandId];
 			if (command) {
 				// Find the original command name (without our alias)
-				const originalName = command.name.replace(/^\[.*?\]\s*/, '');
+				const originalName = command.name.replace(/^\[.*?\]\s*/, "");
 				// Reset to original name
 				command.name = originalName;
 			}

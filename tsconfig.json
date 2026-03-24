@@ -1,41 +1,30 @@
 {
-  "compilerOptions": {
-    "types": [
-      "obsidian-typings"
-    ],
-    "paths": {
-      "obsidian-typings/implementations": [
-        "./node_modules/obsidian-typings/dist/implementations.d.ts",
-        "./node_modules/obsidian-typings/dist/implementations.cjs"
-      ]
-    },
-    "inlineSourceMap": true,
-    "inlineSources": true,
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
-    "target": "ES2021",
-    "allowJs": true,
-    "noImplicitAny": true,
-    "importHelpers": true,
-    "isolatedModules": true,
-    "allowImportingTsExtensions": true,
-    "noEmit": true,
-    "allowSyntheticDefaultImports": true,
-    "verbatimModuleSyntax": true,
-    "forceConsistentCasingInFileNames": true,
-    "strictNullChecks": true,
-    "resolveJsonModule": true,
-    "lib": [
-      "DOM",
-      "ES2021"
-    ]
-  },
-  "include": [
-    "./src/**/*.ts",
-    "./scripts/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "eslint.config.ts"
-  ]
+	"compilerOptions": {
+		"types": ["obsidian-typings"],
+		"paths": {
+			"obsidian-typings/implementations": [
+				"./node_modules/obsidian-typings/dist/implementations.d.ts",
+				"./node_modules/obsidian-typings/dist/implementations.cjs"
+			]
+		},
+		"inlineSourceMap": true,
+		"inlineSources": true,
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
+		"target": "ES2021",
+		"allowJs": true,
+		"noImplicitAny": true,
+		"importHelpers": true,
+		"isolatedModules": true,
+		"allowImportingTsExtensions": true,
+		"noEmit": true,
+		"allowSyntheticDefaultImports": true,
+		"verbatimModuleSyntax": true,
+		"forceConsistentCasingInFileNames": true,
+		"strictNullChecks": true,
+		"resolveJsonModule": true,
+		"lib": ["DOM", "ES2021"]
+	},
+	"include": ["./src/**/*.ts", "./scripts/**/*.ts"],
+	"exclude": ["node_modules", "eslint.config.ts"]
 }

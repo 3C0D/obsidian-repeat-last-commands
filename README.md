@@ -41,13 +41,12 @@ When the command palette is open, you can use these shortcuts:
 Each setting below will appear if you have created aliases or hidden commands:
 
 - **Command Aliases**: View and manage your custom command aliases
-
-  - Shows commands with custom names you've created
-  - You can remove aliases to restore original command names
+    - Shows commands with custom names you've created
+    - You can remove aliases to restore original command names
 
 - **Hidden Commands**: View and manage commands you've hidden from the command palette
-  - Shows commands you've excluded from the command palette
-  - You can restore hidden commands to make them visible again
+    - Shows commands you've excluded from the command palette
+    - You can restore hidden commands to make them visible again
 
 ## Installation
 
@@ -82,14 +81,13 @@ This project is licensed under the MIT License.
 0. **First install yarn:** `npm install -g yarn`
 
 1. **Inside the vault's plugins folder:**
-
-   - Delete the `.env` file or put empty paths.
+    - Delete the `.env` file or put empty paths.
 
 2. **From another folder:**
-   - Set the vault paths in the `.env` file:
-     - `TestVault` for development
-     - `RealVault` for production simulation
-   - Necessary files will be automatically copied to the targeted vault
+    - Set the vault paths in the `.env` file:
+        - `TestVault` for development
+        - `RealVault` for production simulation
+    - Necessary files will be automatically copied to the targeted vault
 
 ### Available Commands
 
