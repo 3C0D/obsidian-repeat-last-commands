@@ -72,6 +72,7 @@ function showPreviewForSelected(
 	const popoverObserver = new MutationObserver(() => {
 		const popover = document.querySelector(".hover-popover") as HTMLElement;
 		if (popover) {
+			clearTimeout(safetyTimeout);
 			popoverObserver.disconnect();
 			setTimeout(() => {
 				const p = document.querySelector(".hover-popover") as HTMLElement;
@@ -85,4 +86,7 @@ function showPreviewForSelected(
 		}
 	});
 	popoverObserver.observe(document.body, { childList: true, subtree: true });
+	
+	// Safety timeout to disconnect observer if popover never appears
+	const safetyTimeout = setTimeout(() => popoverObserver.disconnect(), 3000);
 }

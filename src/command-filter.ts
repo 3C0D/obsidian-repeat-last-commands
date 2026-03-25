@@ -31,7 +31,7 @@ export function registerCommandFilter(plugin: RepeatLastCommands): () => void {
 				}
 
 				try {
-					const { instance } = getModalCmdVars(this);
+					const { instance } = getModalCmdVars(plugin);
 					// Filter out plugin commands and user excluded commands from recent commands
 					if (instance.recentCommands) {
 						instance.recentCommands =

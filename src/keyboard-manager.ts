@@ -1,14 +1,13 @@
 import type RepeatLastCommands from "./main.ts";
-import { addAlias, getConditions, getModalCmdVars } from "./cmd-utils.ts";
+import { addAlias, getConditions, getModalCmdVars, getBackSelection, getBackSelectionById } from "./cmd-utils.ts";
 import { AliasModal, hideCmd, ExcludedCommandsModal } from "./modals.ts";
 import type {
 	CommandPaletteModal,
 	CommandPalettePlugin,
 	CommandPalettePluginInstance,
 	HotkeysSettingTab,
-	SuggestModalChooser,
 } from "obsidian-typings";
-import type { Command, FuzzyMatch, Scope } from "obsidian";
+import type { Scope } from "obsidian";
 
 export class KeyboardManager {
 	constructor(private plugin: RepeatLastCommands) {}
@@ -44,14 +43,11 @@ export class KeyboardManager {
 				}
 
 				// Toggle pinned status
-				if (
-					selectedId &&
-					instance.options.pinned.includes(selectedId)
-				) {
+				if (instance.options.pinned.includes(selectedId)) {
 					instance.options.pinned = instance.options.pinned.filter(
 						(id: string) => id !== selectedId,
 					);
-				} else if (selectedId) {
+				} else {
 					instance.options.pinned.push(selectedId);
 				}
 
@@ -192,33 +188,3 @@ export class KeyboardManager {
 	}
 }
 
-export async function getBackSelection(
-	chooser: any,
-	selectedItem: number,
-): Promise<void> {
-	try {
-		chooser.forceSetSelectedItem(selectedItem);
-	} catch (err) {
-		console.log("Error setting selection:", err);
-	}
-}
-
-export async function getBackSelectionById(
-	chooser: SuggestModalChooser<FuzzyMatch<Command>, CommandPaletteModal>,
-	values: FuzzyMatch<Command>[] | null,
-	itemId: string | undefined,
-): Promise<void> {
-	try {
-		if (values && itemId) {
-			const newIndex = values.findIndex((v) => v.item.id === itemId);
-			if (newIndex !== -1) {
-				chooser.forceSetSelectedItem(
-					newIndex,
-					undefined as unknown as MouseEvent | KeyboardEvent,
-				);
-			}
-		}
-	} catch (err) {
-		console.log("Error finding item by ID:", err);
-	}
-}

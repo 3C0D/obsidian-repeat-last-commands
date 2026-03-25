@@ -23,3 +23,17 @@ declare module "obsidian-typings" {
 		QuickSwitcherModal: typeof SuggestModal<QuickSwitcherItem>;
 	}
 }
+
+// Plugin settings and types
+export interface RLCSettings {
+	maxLastCmds: number;
+	notify: boolean;
+	aliases: Record<string, Record<string, string>>;
+	userExcludedIDs: string[];
+	ifNoCmdOpenPalette: boolean;
+	includeShortcuts: boolean;
+	showCmdId: boolean;
+	excludeCommands: string[];
+}
+
+export type LastCommand = string[];

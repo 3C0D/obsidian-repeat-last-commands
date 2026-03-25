@@ -8,7 +8,7 @@ import {
 } from "obsidian";
 import RepeatLastCommands from "./main.ts";
 import { getConditions, getModalCmdVars, getCommandName } from "./cmd-utils.ts";
-import type { LastCommand } from "./types.ts";
+import type { LastCommand } from "./global.d.ts";
 
 export class LastCommandsModal extends SuggestModal<LastCommand> {
 	constructor(public plugin: RepeatLastCommands) {
@@ -85,13 +85,12 @@ export class LastCommandsModal extends SuggestModal<LastCommand> {
 }
 
 export class AliasModal extends Modal {
-	result: string;
+	result = "";
 	constructor(
 		app: App,
 		public plugin: RepeatLastCommands,
 		public selectedItem: number,
 		public onSubmit: (result: string) => void,
-		public width?: number,
 	) {
 		super(app);
 		this.scope = new Scope(this.scope);
@@ -99,9 +98,6 @@ export class AliasModal extends Modal {
 			this.close();
 			this.onSubmit(this.result);
 		});
-		if (this.width) {
-			this.modalEl.style.width = `${this.width}px`;
-		}
 	}
 
 	onOpen(): void {

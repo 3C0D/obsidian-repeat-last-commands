@@ -63,7 +63,6 @@ export class UIManager {
 			const closeObserver = new MutationObserver(() => {
 				if (!document.body.contains(modalEl)) {
 					closeObserver.disconnect();
-					delete modalEl.dataset.listenersSetup;
 					delete modalEl.dataset.hoverSetup;
 				}
 			});

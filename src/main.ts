@@ -1,5 +1,6 @@
 import { Plugin } from "obsidian";
-import { type RLCSettings, DEFAULT_SETTINGS } from "./types.ts";
+import type { RLCSettings } from "./global.d.ts";
+import { DEFAULT_SETTINGS } from "./constants.ts";
 import { onCommandTrigger } from "./palette.ts";
 
 import { CommandManager } from "./command-manager.ts";
@@ -8,9 +9,6 @@ import { registerCommandFilter } from "./command-filter.ts";
 import { UIManager } from "./ui-manager.ts";
 import { RLCSettingTab } from "./settings.ts";
 
-// Another way to get command ID. suggester in settings or command get command ID
-// Manage aliases find a way to show the number of aliases before to push the button or disabled button and tooltips no aliases created
-// Hidden cmds: use a modal as the modal for aliases
 
 export default class RepeatLastCommands extends Plugin {
 	settings: RLCSettings;

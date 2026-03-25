@@ -9,6 +9,7 @@ An Obsidian plugin that enhances your workflow by allowing you to quickly repeat
 - **Command Aliases**: Create custom names for frequently used commands (manageable in settings)
 - **Command Exclusions**: Hide/show specific commands from the command palette (manageable in settings)
 - **Keyboard Shortcuts**: Quickly configure shortcuts for commands directly from the palette
+- **Quick Switcher Preview**: Enhanced Obsidian native Quick Switcher with hover preview functionality (press `Ctrl+S` to toggle)
 
 ## How to Use
 
@@ -17,6 +18,14 @@ An Obsidian plugin that enhances your workflow by allowing you to quickly repeat
 - **Last Command**: Execute your most recently used command
 - **Last Commands modal**: Open a modal with your command history to select from
 - **Copy Command ID**: Copy the ID of the last executed command to clipboard
+
+### Quick Switcher Enhancement
+
+When using the native Obsidian Quick Switcher:
+
+- Press **`Ctrl+S`** to toggle file preview
+- Hover over any file in the list to see its preview
+- The preview appears centered in the switcher modal
 
 ### Command Aliases
 

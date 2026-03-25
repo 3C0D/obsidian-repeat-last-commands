@@ -112,13 +112,15 @@ export async function getBackSelection(
 
 export async function getBackSelectionById(
 	chooser: any,
-	values: any[],
-	itemId: string,
+	values: any[] | null,
+	itemId: string | undefined,
 ): Promise<void> {
 	try {
-		const newIndex = values.findIndex((v) => v.item.id === itemId);
-		if (newIndex !== -1) {
-			chooser.forceSetSelectedItem(newIndex);
+		if (values && itemId) {
+			const newIndex = values.findIndex((v) => v.item.id === itemId);
+			if (newIndex !== -1) {
+				chooser.forceSetSelectedItem(newIndex);
+			}
 		}
 	} catch (err) {
 		console.log("Error finding item by ID:", err);
