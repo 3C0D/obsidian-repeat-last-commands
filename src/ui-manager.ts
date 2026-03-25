@@ -17,18 +17,23 @@ export class UIManager {
 	 */
 	public addInfoToPalette(): void {
 		const { modal } = getModalCmdVars(this.plugin);
-		const resultContainerEl = modal.resultContainerEl;
-		const existingInfoDiv = modal.modalEl.querySelector(
-			".result-container-afterend",
-		);
-
-		if (!existingInfoDiv) {
-			const infoDiv = document.createElement("div");
-			infoDiv.className = "result-container-afterend";
-			infoDiv.style.textAlign = "center";
-			infoDiv.innerHTML =
-				"Ctrl+A: alias | Ctrl+P: pin | Ctrl+-: hide | Ctrl++: show | Ctrl+H: edit hotkey";
-			resultContainerEl.insertAdjacentElement("afterend", infoDiv);
+		const instructions = modal.modalEl.querySelector(
+			".prompt-instructions",
+		) as HTMLElement;
+		if (instructions && !instructions.querySelector(".palette-info")) {
+			const shortcuts = [
+				{ key: "ctrl+h", label: "edit hotkey" },
+				{ key: "ctrl+-", label: "hide" },
+				{ key: "ctrl++", label: "show" },
+				{ key: "ctrl+p", label: "pin" },
+				{ key: "ctrl+a", label: "alias" },
+			];
+			shortcuts.forEach(({ key, label }) => {
+				const div = document.createElement("div");
+				div.className = "prompt-instruction palette-info";
+				div.innerHTML = `<span class="prompt-instruction-command" style="color: var(--interactive-accent) ; font-weight: bold;">${key}</span><span>${label}</span>`;
+				instructions.prepend(div);
+			});
 		}
 	}
 
@@ -43,30 +48,14 @@ export class UIManager {
 			const infoDiv = document.createElement("div");
 			infoDiv.className = "prompt-instruction switcher-info";
 			infoDiv.innerHTML =
-				'<span class="prompt-instruction-command" style="color: var(--color-green)">ctrl+s</span><span style="color: var(--color-green)">preview</span>';
+				'<span class="prompt-instruction-command" style="color: var(--interactive-accent); font-weight: bold;">ctrl+s</span><span>preview</span>';
 			instructions.prepend(infoDiv);
 		}
 
 		if (switcherModal?.scope && !modalEl.dataset.hoverSetup) {
 			modalEl.dataset.hoverSetup = "true";
-			let isPreviewMode = false;
-
 			switcherModal.scope.register(["Ctrl"], "S", () => {
-				isPreviewMode = !isPreviewMode;
-				if (isPreviewMode) {
-					setupHoverPreview(
-						this.plugin,
-						modalEl,
-						switcherModal,
-						() => {
-							isPreviewMode = false;
-							delete modalEl.dataset.previewActive;
-						},
-					);
-				} else {
-					document.querySelector(".hover-popover")?.remove();
-					delete modalEl.dataset.previewActive;
-				}
+				setupHoverPreview(this.plugin, modalEl, switcherModal);
 				return false;
 			});
 		}
