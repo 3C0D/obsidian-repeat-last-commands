@@ -11,10 +11,10 @@ import { RLCSettingTab } from "./settings.ts";
 
 
 export default class RepeatLastCommands extends Plugin {
-	settings: RLCSettings;
-	commandManager: CommandManager;
-	keyboardManager: KeyboardManager;
-	uiManager: UIManager;
+	settings!: RLCSettings;
+	commandManager!: CommandManager;
+	keyboardManager!: KeyboardManager;
+	uiManager!: UIManager;
 
 	async onload(): Promise<void> {
 		// Load user settings from storage

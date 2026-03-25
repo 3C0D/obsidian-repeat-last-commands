@@ -1,13 +1,13 @@
 import type { Command } from "obsidian";
 import type RepeatLastCommands from "./main.ts";
 import { around } from "monkey-around";
-import type { RLCSettings } from "./types.ts";
+import type { RLCSettings } from "./global.d.ts";
 import { getModalCmdVars } from "./cmd-utils.ts";
 
 export function onCommandTrigger(plugin: RepeatLastCommands): any {
 	return around(plugin.app.commands, {
 		executeCommand(originalMethod) {
-			return function (command: Command, event?: Event) {
+			return function (this: any, command: Command, event?: Event) {
 				const commandId = command.id;
 
 				if (commandId === "command-palette:open") {
@@ -83,7 +83,7 @@ export function shouldExcludeCommand(
 		commandId === "command-palette:open" ||
 		settings.excludeCommands.includes(commandId) ||
 		settings.userExcludedIDs.some(
-			(excludedId) =>
+			(excludedId: string) =>
 				commandId === excludedId || commandId.startsWith(excludedId),
 		)
 	);

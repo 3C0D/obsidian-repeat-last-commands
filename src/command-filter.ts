@@ -9,8 +9,8 @@ export function registerCommandFilter(plugin: RepeatLastCommands): () => void {
 
 	return around(plugin.app.commands.constructor.prototype, {
 		listCommands(old: () => Command[]): () => Command[] {
-			return function (...args: unknown[]): Command[] {
-				const commands: Command[] = old.call(this, ...args);
+			return function (this: any): Command[] {
+				const commands: Command[] = old.call(this);
 
 				// Filter excluded commands
 				const filteredCommands = commands.filter(
