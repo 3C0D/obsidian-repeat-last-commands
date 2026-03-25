@@ -55,9 +55,19 @@ export class UIManager {
 		if (switcherModal?.scope && !modalEl.dataset.hoverSetup) {
 			modalEl.dataset.hoverSetup = "true";
 			switcherModal.scope.register(["Ctrl"], "S", () => {
-				setupHoverPreview(this.plugin, modalEl, switcherModal);
+					setupHoverPreview(this.plugin, modalEl, switcherModal);
 				return false;
 			});
+
+			// Cleanup when modal closes
+			const closeObserver = new MutationObserver(() => {
+				if (!document.body.contains(modalEl)) {
+					closeObserver.disconnect();
+					delete modalEl.dataset.listenersSetup;
+					delete modalEl.dataset.hoverSetup;
+				}
+			});
+			closeObserver.observe(document.body, { childList: true, subtree: true });
 		}
 	}
 }

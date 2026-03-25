@@ -81,7 +81,7 @@ function showPreviewForSelected(
 				p.style.left = `${modalRect.left + modalRect.width * 0.3}px`;
 				p.style.top = `${modalRect.top + modalRect.height * 0.5 - p.offsetHeight * 0.5}px`;
 				p.style.zIndex = "9999";
-			}, 0);
+			}, 50);
 		}
 	});
 	popoverObserver.observe(document.body, { childList: true, subtree: true });
