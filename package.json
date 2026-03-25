@@ -38,12 +38,12 @@
 		"fs-extra": "^11.2.0",
 		"jiti": "^2.6.1",
 		"monkey-around": "^3.0.0",
-		"obsidian": "*",
-		"obsidian-typings": "^3.9.5",
+		"obsidian": "latest",
+		"obsidian-typings": "5.18.0",
 		"semver": "^7.7.2",
 		"tslib": "2.4.0",
 		"tsx": "^4.19.4",
-		"typescript": "^5.8.2"
+		"typescript": "latest"
 	},
 	"engines": {
 		"npm": "please-use-yarn",

@@ -7,15 +7,15 @@ import { getModalCmdVars } from "./cmd-utils.ts";
 export function onCommandTrigger(plugin: RepeatLastCommands): any {
 	return around(plugin.app.commands, {
 		executeCommand(originalMethod) {
-			return function (...args: Command[]) {
-				const commandId = args[0].id;
+			return function (command: Command, event?: Event) {
+				const commandId = command.id;
 
 				if (commandId === "command-palette:open") {
 					plugin.uiManager.addInfoToPalette();
 				}
 
 				const result =
-					originalMethod && originalMethod.apply(this, args);
+					originalMethod && originalMethod.call(this, command, event);
 
 				// Track commands executed via shortcuts if setting is enabled
 				if (
