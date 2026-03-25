@@ -14,6 +14,29 @@ export function onCommandTrigger(plugin: RepeatLastCommands): any {
 					plugin.uiManager.addInfoToPalette();
 				}
 
+				if (commandId === "switcher:open") {
+					const observer = new MutationObserver((_, obs) => {
+						const modalEl = document.querySelector(
+							".modal-container .prompt",
+						) as HTMLElement;
+						if (modalEl) {
+							obs.disconnect();
+							const switcher = plugin.app.internalPlugins.getPluginById(
+								"switcher",
+							);
+							const activeModal = (switcher as any)?.instance?.activeModal;
+							plugin.uiManager.addInfoToSwitcher(
+								modalEl,
+								activeModal,
+							);
+						}
+					});
+					observer.observe(document.body, {
+						childList: true,
+						subtree: true,
+					});
+				}
+
 				const result =
 					originalMethod && originalMethod.call(this, command, event);
 

@@ -1,6 +1,7 @@
 import { Plugin } from "obsidian";
 import { type RLCSettings, DEFAULT_SETTINGS } from "./types.ts";
 import { onCommandTrigger } from "./palette.ts";
+
 import { CommandManager } from "./command-manager.ts";
 import { KeyboardManager } from "./keyboard-manager.ts";
 import { registerCommandFilter } from "./command-filter.ts";
@@ -36,6 +37,12 @@ export default class RepeatLastCommands extends Plugin {
 
 		// Monitor command palette opening to add additional information
 		this.register(onCommandTrigger(this));
+
+		// Register hover link source for quick switcher preview
+		this.registerHoverLinkSource("switcher", {
+			display: "Quick Switcher",
+			defaultMod: false,
+		});
 
 		// Configure specific keyboard shortcuts in the command palette (Ctrl+A, Ctrl+P, etc.)
 		this.keyboardManager.registerKeyBindings();

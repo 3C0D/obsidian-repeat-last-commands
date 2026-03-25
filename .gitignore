@@ -31,6 +31,3 @@ main.css
 
 # Keep injection info for traceability
 # .injection-info.json should be committed to track injection version
-
-# Symlink to other-people-plugins
-other-people-plugins
