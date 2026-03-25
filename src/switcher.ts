@@ -10,6 +10,7 @@ export function setupHoverPreview(
 
 	modalEl.querySelectorAll<HTMLElement>(".suggestion-item").forEach((el) => {
 		el.addEventListener("mouseover", (event: MouseEvent) => {
+			if (!modalEl.dataset.previewActive) return;
 			const path = el
 				.querySelector(".suggestion-title")
 				?.textContent?.trim();
@@ -49,8 +50,15 @@ function showPreviewForSelected(
 		plugin.app.metadataCache.getFirstLinkpathDest(path, "");
 	if (!file) return;
 	const activeView = plugin.app.workspace.getActiveViewOfType(MarkdownView);
+	const rect = selected.getBoundingClientRect();
+	const event = new MouseEvent("mouseover", {
+		bubbles: true,
+		cancelable: true,
+		clientX: rect.right,
+		clientY: rect.top + rect.height / 2,
+	});
 	plugin.app.workspace.trigger("hover-link", {
-		event: new MouseEvent("mouseover", { bubbles: true, cancelable: true }),
+		event,
 		source: "switcher",
 		hoverParent: activeView ?? switcherModal,
 		targetEl: selected,
@@ -58,7 +66,9 @@ function showPreviewForSelected(
 		sourcePath: "",
 	});
 
-	// Position popover at center of modal
+	// Force recreation of popover
+	document.querySelector(".hover-popover")?.remove();
+
 	const popoverObserver = new MutationObserver(() => {
 		const popover = document.querySelector(".hover-popover") as HTMLElement;
 		if (popover) {
