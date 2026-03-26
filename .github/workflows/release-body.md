@@ -1,1 +1,1 @@
-feature: Enhanced Quick Switcher with Quick Preview support
+fuzzy search added to excluded commands modal and reset button with confirm
