@@ -1,1 +1,1 @@
-little code improvement
+feature: Enhanced Quick Switcher with Quick Preview support
