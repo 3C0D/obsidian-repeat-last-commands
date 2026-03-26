@@ -2,6 +2,7 @@ import {
 	App,
 	Modal,
 	Scope,
+	SearchComponent,
 	Setting,
 	SuggestModal,
 	TextComponent,
@@ -217,8 +218,48 @@ export class AliasManagementModal extends Modal {
 	}
 }
 
+function fuzzyMatch(query: string, text: string): boolean {
+	if (!query) return true;
+	const q = query.toLowerCase();
+	const t = text.toLowerCase();
+	let qi = 0;
+	for (let i = 0; i < t.length && qi < q.length; i++) {
+		if (t[i] === q[qi]) qi++;
+	}
+	return qi === q.length;
+}
+
+class ConfirmModal extends Modal {
+	private confirm(confirmed: boolean): void {
+		this.callback(confirmed);
+		this.close();
+	}
+	constructor(
+		app: App,
+		public message: string,
+		public callback: (confirmed: boolean) => void,
+	) {
+		super(app);
+		this.scope = new Scope(this.scope);
+		this.scope.register([], "Enter", () => this.confirm(true));
+	}
+	onOpen(): void {
+		this.contentEl.empty();
+		this.contentEl.createEl("p").setText(this.message);
+		new Setting(this.contentEl)
+			.addButton((b) => b.setIcon("checkmark").setCta().onClick(() => this.confirm(true)))
+			.addExtraButton((b) => b.setIcon("cross").onClick(() => this.confirm(false)));
+	}
+	onClose(): void { this.contentEl.empty(); }
+}
+
+async function openConfirmModal(app: App, message: string): Promise<boolean> {
+	return new Promise((resolve) => new ConfirmModal(app, message, resolve).open());
+}
+
 export class ExcludedCommandsModal extends Modal {
 	private hasChanges = false;
+	private searchQuery = "";
 
 	constructor(
 		app: App,
@@ -228,59 +269,81 @@ export class ExcludedCommandsModal extends Modal {
 		super(app);
 	}
 
-	onOpen(): void {
+	onOpen(): void { this.render(); }
+
+	private render(): void {
 		const { contentEl } = this;
 		contentEl.empty();
-
 		this.titleEl.setText("Manage Hidden Commands");
 
-		if (
-			this.plugin.settings.excludeCommands &&
-			this.plugin.settings.excludeCommands.length > 0
-		) {
-			contentEl.createEl("p", {
-				text: "These commands have been hidden from the command palette. Click the restore button to make them visible again.",
-			});
+		const excluded = this.plugin.settings.excludeCommands;
 
-			this.plugin.settings.excludeCommands.forEach(
-				(commandId: string) => {
-					const commandName = getCommandName(
-						this.plugin.app,
-						commandId,
+		if (excluded.length === 0) {
+			contentEl.createEl("p", { text: "No commands have been hidden yet." });
+			return;
+		}
+
+		new Setting(contentEl).addSearch((search: SearchComponent) => {
+			search
+				.setValue(this.searchQuery)
+				.setPlaceholder("Search hidden commands...")
+				.onChange((value: string) => {
+					this.searchQuery = value;
+					this.renderList(listEl);
+				});
+		});
+
+		const listEl = contentEl.createEl("div", { cls: "excluded-list" });
+		this.renderList(listEl);
+
+		new Setting(contentEl).addButton((btn) =>
+			btn.setButtonText(`Restore all (${excluded.length})`)
+				.onClick(async () => {
+					const confirmed = await openConfirmModal(
+						this.app,
+						`Restore all ${excluded.length} hidden commands?`,
 					);
+					if (!confirmed) return;
+					this.plugin.settings.excludeCommands = [];
+					await this.plugin.saveSettings();
+					this.hasChanges = true;
+					this.render();
+				}),
+		);
+	}
 
-					new Setting(contentEl)
-						.setName(commandName || commandId)
-						.setDesc(`ID: ${commandId}`)
-						.addButton((button) => {
-							button
-								.setIcon("eye")
-								.setTooltip("Restore this command")
-								.onClick(async () => {
-									// Remove the command from excluded list
-									this.plugin.settings.excludeCommands =
-										this.plugin.settings.excludeCommands.filter(
-											(id: string) => id !== commandId,
-										);
-									await this.plugin.saveSettings();
-									this.hasChanges = true; // Mark that changes were made
-									this.onOpen(); // Refresh the modal
-								});
-						});
-				},
-			);
-		} else {
-			contentEl.createEl("p", {
-				text: "No commands have been hidden yet.",
-			});
+	private renderList(listEl: HTMLElement): void {
+		listEl.empty();
+		const excluded = this.plugin.settings.excludeCommands;
+		const filtered = excluded.filter((id) =>
+			fuzzyMatch(this.searchQuery, getCommandName(this.plugin.app, id)),
+		);
+
+		if (filtered.length === 0) {
+			listEl.createEl("p", { text: "No matching commands." });
+			return;
+		}
+
+		for (const commandId of filtered) {
+			new Setting(listEl)
+				.setName(getCommandName(this.plugin.app, commandId))
+				.addExtraButton((btn) =>
+					btn.setIcon("eye").setTooltip("Restore this command")
+						.onClick(async () => {
+							this.plugin.settings.excludeCommands =
+								this.plugin.settings.excludeCommands.filter(
+									(id) => id !== commandId,
+								);
+							await this.plugin.saveSettings();
+							this.hasChanges = true;
+							this.renderList(listEl);
+						}),
+				);
 		}
 	}
 
 	onClose(): void {
-		const { contentEl } = this;
-		contentEl.empty();
-
-		// If changes were made and we have a palette modal, refresh it
+		this.contentEl.empty();
 		if (this.hasChanges && this.paletteModal) {
 			this.paletteModal.close();
 			this.plugin.app.commands.executeCommandById("command-palette:open");
