@@ -1,14 +1,13 @@
-import { Plugin } from "obsidian";
-import type { RLCSettings } from "./global.d.ts";
-import { DEFAULT_SETTINGS } from "./constants.ts";
-import { onCommandTrigger } from "./palette.ts";
+import { Plugin } from 'obsidian';
+import type { RLCSettings } from './global.d.ts';
+import { DEFAULT_SETTINGS } from './constants.ts';
+import { onCommandTrigger } from './palette.ts';
 
-import { CommandManager } from "./command-manager.ts";
-import { KeyboardManager } from "./keyboard-manager.ts";
-import { registerCommandFilter } from "./command-filter.ts";
-import { UIManager } from "./ui-manager.ts";
-import { RLCSettingTab } from "./settings.ts";
-
+import { CommandManager } from './command-manager.ts';
+import { KeyboardManager } from './keyboard-manager.ts';
+import { registerCommandFilter } from './command-filter.ts';
+import { UIManager } from './ui-manager.ts';
+import { RLCSettingTab } from './settings.ts';
 
 export default class RepeatLastCommands extends Plugin {
 	settings!: RLCSettings;
@@ -37,9 +36,9 @@ export default class RepeatLastCommands extends Plugin {
 		this.register(onCommandTrigger(this));
 
 		// Register hover link source for quick switcher preview
-		this.registerHoverLinkSource("switcher", {
-			display: "Quick Switcher",
-			defaultMod: false,
+		this.registerHoverLinkSource('switcher', {
+			display: 'Quick Switcher',
+			defaultMod: false
 		});
 
 		// Configure specific keyboard shortcuts in the command palette (Ctrl+A, Ctrl+P, etc.)
@@ -47,38 +46,34 @@ export default class RepeatLastCommands extends Plugin {
 
 		// Define command to repeat the last executed command
 		this.addCommand({
-			id: "repeat-last-command",
-			name: "Last command",
+			id: 'repeat-last-command',
+			name: 'Last command',
 			callback: async () => {
 				await this.commandManager.executeLastCommand();
-			},
+			}
 		});
 
 		// Define command to display and choose from recent commands
 		this.addCommand({
-			id: "repeat-commands",
-			name: "Last commands modal",
+			id: 'repeat-commands',
+			name: 'Last commands modal',
 			callback: async () => {
 				await this.commandManager.showCommandsList();
-			},
+			}
 		});
 
 		// Define command to copy the last command ID to clipboard
 		this.addCommand({
-			id: "get-last-command",
-			name: "Copy last command ID",
+			id: 'get-last-command',
+			name: 'Copy last command ID',
 			callback: async () => {
 				await this.commandManager.copyLastCommandId();
-			},
+			}
 		});
 	}
 
 	async loadSettings(): Promise<void> {
-		this.settings = Object.assign(
-			{},
-			DEFAULT_SETTINGS,
-			await this.loadData(),
-		);
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
 	}
 
 	async saveSettings(): Promise<void> {
@@ -99,7 +94,7 @@ export default class RepeatLastCommands extends Plugin {
 			const command = commands[commandId];
 			if (command) {
 				// Find the original command name (without our alias)
-				const originalName = command.name.replace(/^\[.*?\]\s*/, "");
+				const originalName = command.name.replace(/^\[.*?\]\s*/, '');
 				// Reset to original name
 				command.name = originalName;
 			}

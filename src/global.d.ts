@@ -1,8 +1,8 @@
-import { TFile, SuggestModal } from "obsidian";
+import { TFile, SuggestModal } from 'obsidian';
 
 export {};
 
-declare module "obsidian-typings" {
+declare module 'obsidian-typings' {
 	interface CommandScope {
 		keys: Array<{
 			scope: any;
@@ -14,7 +14,7 @@ declare module "obsidian-typings" {
 	}
 
 	interface QuickSwitcherItem {
-		type: "file" | unknown;
+		type: 'file' | unknown;
 		file?: TFile;
 	}
 

@@ -1,8 +1,8 @@
-import { Notice } from "obsidian";
-import type RepeatLastCommands from "./main.ts";
-import { getModalCmdVars } from "./cmd-utils.ts";
-import { LastCommandsModal } from "./modals.ts";
-import type { CommandPalettePluginInstance } from "obsidian-typings";
+import { Notice } from 'obsidian';
+import type RepeatLastCommands from './main.ts';
+import { getModalCmdVars } from './cmd-utils.ts';
+import { LastCommandsModal } from './modals.ts';
+import type { CommandPalettePluginInstance } from 'obsidian-typings';
 
 export class CommandManager {
 	private instance: CommandPalettePluginInstance;
@@ -41,26 +41,24 @@ export class CommandManager {
 		if (lastCommand) {
 			try {
 				await navigator.clipboard.writeText(lastCommand);
-				new Notice("Command id copied in clipboard");
+				new Notice('Command id copied in clipboard');
 			} catch (err) {
 				console.error(err);
 			}
 		} else {
-			new Notice("No last command");
+			new Notice('No last command');
 		}
 	}
 
 	// Opens command palette by default when no command is found
 	private handleNoCommand(): void {
 		if (this.plugin.settings.ifNoCmdOpenPalette) {
-			new Notice("No last command.\nOpening command palette...");
+			new Notice('No last command.\nOpening command palette...');
 			setTimeout(() => {
-				this.plugin.app.commands.executeCommandById(
-					"command-palette:open",
-				);
+				this.plugin.app.commands.executeCommandById('command-palette:open');
 			}, 400);
 		} else {
-			new Notice("No last command.");
+			new Notice('No last command.');
 		}
 	}
 }

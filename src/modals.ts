@@ -5,11 +5,11 @@ import {
 	SearchComponent,
 	Setting,
 	SuggestModal,
-	TextComponent,
-} from "obsidian";
-import RepeatLastCommands from "./main.ts";
-import { getConditions, getModalCmdVars, getCommandName } from "./cmd-utils.ts";
-import type { LastCommand } from "./global.d.ts";
+	TextComponent
+} from 'obsidian';
+import RepeatLastCommands from './main.ts';
+import { getConditions, getModalCmdVars, getCommandName } from './cmd-utils.ts';
+import type { LastCommand } from './global.d.ts';
 
 export class LastCommandsModal extends SuggestModal<LastCommand> {
 	constructor(public plugin: RepeatLastCommands) {
@@ -22,10 +22,7 @@ export class LastCommandsModal extends SuggestModal<LastCommand> {
 		const lastCommands = instance.recentCommands;
 
 		// Take the first N commands (most recent are at the beginning)
-		const recentCommands = lastCommands.slice(
-			0,
-			this.plugin.settings.maxLastCmds,
-		);
+		const recentCommands = lastCommands.slice(0, this.plugin.settings.maxLastCmds);
 
 		let lastCommandsArr = recentCommands.map((id: string) => {
 			try {
@@ -38,35 +35,35 @@ export class LastCommandsModal extends SuggestModal<LastCommand> {
 		});
 
 		return lastCommandsArr.filter((cmd: string[]) =>
-			cmd[1].toLowerCase().includes(query.toLowerCase()),
+			cmd[1].toLowerCase().includes(query.toLowerCase())
 		);
 	}
 
 	renderSuggestion(cmd: LastCommand, el: HTMLElement): void {
-		if (cmd[1].includes(":")) {
-			const [name, command] = cmd[1].toString().split(":");
+		if (cmd[1].includes(':')) {
+			const [name, command] = cmd[1].toString().split(':');
 			el.createEl(
-				"div",
+				'div',
 				{
-					cls: "cmd-suggest",
+					cls: 'cmd-suggest'
 				},
 				(cont) => {
-					cont.createEl("span", {
+					cont.createEl('span', {
 						text: `${name}:`,
-						cls: "cmd-suggest-name",
+						cls: 'cmd-suggest-name'
 					});
-					cont.createEl("span", {
+					cont.createEl('span', {
 						text: `${command}`,
-						cls: "cmd-suggest-cmd",
+						cls: 'cmd-suggest-cmd'
 					});
-				},
+				}
 			);
 		} else {
-			el.createEl("div", { text: `${cmd[1]}`, cls: "cmd-alone" });
+			el.createEl('div', { text: `${cmd[1]}`, cls: 'cmd-alone' });
 		}
 
 		if (this.plugin.settings.showCmdId)
-			el.createEl("div", { text: `${cmd[0]}`, cls: "id-suggest" });
+			el.createEl('div', { text: `${cmd[0]}`, cls: 'id-suggest' });
 	}
 
 	onChooseSuggestion(cmd: LastCommand): void {
@@ -86,16 +83,16 @@ export class LastCommandsModal extends SuggestModal<LastCommand> {
 }
 
 export class AliasModal extends Modal {
-	result = "";
+	result = '';
 	constructor(
 		app: App,
 		public plugin: RepeatLastCommands,
 		public selectedItem: number,
-		public onSubmit: (result: string) => void,
+		public onSubmit: (result: string) => void
 	) {
 		super(app);
 		this.scope = new Scope(this.scope);
-		this.scope.register([], "Enter", () => {
+		this.scope.register([], 'Enter', () => {
 			this.close();
 			this.onSubmit(this.result);
 		});
@@ -105,7 +102,7 @@ export class AliasModal extends Modal {
 		const { contentEl } = this;
 		contentEl.empty();
 		const { chooser } = getConditions(this.plugin);
-		let name = "";
+		let name = '';
 		if (chooser.values && chooser.values[this.selectedItem]) {
 			name = chooser.values[this.selectedItem].item.name;
 		}
@@ -114,31 +111,31 @@ export class AliasModal extends Modal {
 
 		// Create the input field
 		const input = new TextComponent(contentEl)
-			.setPlaceholder("Enter alias text here")
+			.setPlaceholder('Enter alias text here')
 			.onChange(async (value) => {
 				this.result = value;
 			});
 		const eL = input.inputEl;
-		eL.addClass("alias-input");
+		eL.addClass('alias-input');
 		eL.size = 42;
 
 		// Add a more visually integrated help text
-		contentEl.createEl("div", {
-			text: "(To remove the alias, submit an empty field)",
-			cls: "alias-note",
+		contentEl.createEl('div', {
+			text: '(To remove the alias, submit an empty field)',
+			cls: 'alias-note',
 			attr: {
-				style: "font-size: 0.8em; color: var(--text-muted); margin-top: 4px; text-align: end; margin-right: 70px",
-			},
+				style: 'font-size: 0.8em; color: var(--text-muted); margin-top: 4px; text-align: end; margin-right: 70px'
+			}
 		});
 
 		new Setting(contentEl).addButton((btn) =>
 			btn
-				.setButtonText("Submit")
+				.setButtonText('Submit')
 				.setCta()
 				.onClick(() => {
 					this.onSubmit(this.result);
 					this.close();
-				}),
+				})
 		);
 	}
 
@@ -151,7 +148,7 @@ export class AliasModal extends Modal {
 export class AliasManagementModal extends Modal {
 	constructor(
 		app: App,
-		public plugin: RepeatLastCommands,
+		public plugin: RepeatLastCommands
 	) {
 		super(app);
 	}
@@ -160,41 +157,34 @@ export class AliasManagementModal extends Modal {
 		const { contentEl } = this;
 		contentEl.empty();
 
-		this.titleEl.setText("Manage Command Aliases");
+		this.titleEl.setText('Manage Command Aliases');
 
 		if (
 			this.plugin.settings.aliases &&
 			Object.keys(this.plugin.settings.aliases).length > 0
 		) {
-			contentEl.createEl("p", {
-				text: "These commands have custom aliases. Remove them to restore original names.",
+			contentEl.createEl('p', {
+				text: 'These commands have custom aliases. Remove them to restore original names.'
 			});
 
 			Object.entries(this.plugin.settings.aliases).forEach(
 				([commandId, aliasData]) => {
-					const originalName = aliasData.name.replace(
-						/^\[.*?\]\s*/,
-						"",
-					);
+					const originalName = aliasData.name.replace(/^\[.*?\]\s*/, '');
 
 					new Setting(contentEl)
 						.setName(aliasData.name)
 						.setDesc(`Original: ${originalName}`)
 						.addButton((button) => {
 							button
-								.setIcon("trash")
-								.setTooltip("Remove this alias")
+								.setIcon('trash')
+								.setTooltip('Remove this alias')
 								.onClick(async () => {
 									// Remove the alias from settings
-									delete this.plugin.settings.aliases[
-										commandId
-									];
+									delete this.plugin.settings.aliases[commandId];
 
 									// Update the command name in the app
 									const command =
-										this.plugin.app.commands.commands[
-											commandId
-										];
+										this.plugin.app.commands.commands[commandId];
 									if (command) {
 										command.name = originalName;
 									}
@@ -203,11 +193,11 @@ export class AliasManagementModal extends Modal {
 									this.onOpen(); // Refresh the modal
 								});
 						});
-				},
+				}
 			);
 		} else {
-			contentEl.createEl("p", {
-				text: 'No aliases have been created yet. You can create aliases from the command palette using the "Define alias" option.',
+			contentEl.createEl('p', {
+				text: 'No aliases have been created yet. You can create aliases from the command palette using the "Define alias" option.'
 			});
 		}
 	}
@@ -237,20 +227,27 @@ class ConfirmModal extends Modal {
 	constructor(
 		app: App,
 		public message: string,
-		public callback: (confirmed: boolean) => void,
+		public callback: (confirmed: boolean) => void
 	) {
 		super(app);
 		this.scope = new Scope(this.scope);
-		this.scope.register([], "Enter", () => this.confirm(true));
+		this.scope.register([], 'Enter', () => this.confirm(true));
 	}
 	onOpen(): void {
 		this.contentEl.empty();
-		this.contentEl.createEl("p").setText(this.message);
+		this.contentEl.createEl('p').setText(this.message);
 		new Setting(this.contentEl)
-			.addButton((b) => b.setIcon("checkmark").setCta().onClick(() => this.confirm(true)))
-			.addExtraButton((b) => b.setIcon("cross").onClick(() => this.confirm(false)));
+			.addButton((b) =>
+				b
+					.setIcon('checkmark')
+					.setCta()
+					.onClick(() => this.confirm(true))
+			)
+			.addExtraButton((b) => b.setIcon('cross').onClick(() => this.confirm(false)));
 	}
-	onClose(): void { this.contentEl.empty(); }
+	onClose(): void {
+		this.contentEl.empty();
+	}
 }
 
 async function openConfirmModal(app: App, message: string): Promise<boolean> {
@@ -259,56 +256,57 @@ async function openConfirmModal(app: App, message: string): Promise<boolean> {
 
 export class ExcludedCommandsModal extends Modal {
 	private hasChanges = false;
-	private searchQuery = "";
+	private searchQuery = '';
 
 	constructor(
 		app: App,
 		public plugin: RepeatLastCommands,
-		public paletteModal?: any,
+		public paletteModal?: any
 	) {
 		super(app);
 	}
 
-	onOpen(): void { this.render(); }
+	onOpen(): void {
+		this.render();
+	}
 
 	private render(): void {
 		const { contentEl } = this;
 		contentEl.empty();
-		this.titleEl.setText("Manage Hidden Commands");
+		this.titleEl.setText('Manage Hidden Commands');
 
 		const excluded = this.plugin.settings.excludeCommands;
 
 		if (excluded.length === 0) {
-			contentEl.createEl("p", { text: "No commands have been hidden yet." });
+			contentEl.createEl('p', { text: 'No commands have been hidden yet.' });
 			return;
 		}
 
 		new Setting(contentEl).addSearch((search: SearchComponent) => {
 			search
 				.setValue(this.searchQuery)
-				.setPlaceholder("Search hidden commands...")
+				.setPlaceholder('Search hidden commands...')
 				.onChange((value: string) => {
 					this.searchQuery = value;
 					this.renderList(listEl);
 				});
 		});
 
-		const listEl = contentEl.createEl("div", { cls: "excluded-list" });
+		const listEl = contentEl.createEl('div', { cls: 'excluded-list' });
 		this.renderList(listEl);
 
 		new Setting(contentEl).addButton((btn) =>
-			btn.setButtonText(`Restore all (${excluded.length})`)
-				.onClick(async () => {
-					const confirmed = await openConfirmModal(
-						this.app,
-						`Restore all ${excluded.length} hidden commands?`,
-					);
-					if (!confirmed) return;
-					this.plugin.settings.excludeCommands = [];
-					await this.plugin.saveSettings();
-					this.hasChanges = true;
-					this.render();
-				}),
+			btn.setButtonText(`Restore all (${excluded.length})`).onClick(async () => {
+				const confirmed = await openConfirmModal(
+					this.app,
+					`Restore all ${excluded.length} hidden commands?`
+				);
+				if (!confirmed) return;
+				this.plugin.settings.excludeCommands = [];
+				await this.plugin.saveSettings();
+				this.hasChanges = true;
+				this.render();
+			})
 		);
 	}
 
@@ -316,11 +314,11 @@ export class ExcludedCommandsModal extends Modal {
 		listEl.empty();
 		const excluded = this.plugin.settings.excludeCommands;
 		const filtered = excluded.filter((id) =>
-			fuzzyMatch(this.searchQuery, getCommandName(this.plugin.app, id)),
+			fuzzyMatch(this.searchQuery, getCommandName(this.plugin.app, id))
 		);
 
 		if (filtered.length === 0) {
-			listEl.createEl("p", { text: "No matching commands." });
+			listEl.createEl('p', { text: 'No matching commands.' });
 			return;
 		}
 
@@ -328,16 +326,18 @@ export class ExcludedCommandsModal extends Modal {
 			new Setting(listEl)
 				.setName(getCommandName(this.plugin.app, commandId))
 				.addExtraButton((btn) =>
-					btn.setIcon("eye").setTooltip("Restore this command")
+					btn
+						.setIcon('eye')
+						.setTooltip('Restore this command')
 						.onClick(async () => {
 							this.plugin.settings.excludeCommands =
 								this.plugin.settings.excludeCommands.filter(
-									(id) => id !== commandId,
+									(id) => id !== commandId
 								);
 							await this.plugin.saveSettings();
 							this.hasChanges = true;
 							this.renderList(listEl);
-						}),
+						})
 				);
 		}
 	}
@@ -346,7 +346,7 @@ export class ExcludedCommandsModal extends Modal {
 		this.contentEl.empty();
 		if (this.hasChanges && this.paletteModal) {
 			this.paletteModal.close();
-			this.plugin.app.commands.executeCommandById("command-palette:open");
+			this.plugin.app.commands.executeCommandById('command-palette:open');
 		}
 	}
 }
@@ -354,7 +354,7 @@ export class ExcludedCommandsModal extends Modal {
 export async function hideCmd(
 	plugin: RepeatLastCommands,
 	selectedItem: number,
-	chooser: any,
+	chooser: any
 ): Promise<void> {
 	const id = chooser.values[selectedItem].item.id;
 

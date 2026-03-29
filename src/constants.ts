@@ -1,4 +1,4 @@
-import type { RLCSettings } from "./global.d.ts";
+import type { RLCSettings } from './global.d.ts';
 
 export const DEFAULT_SETTINGS: RLCSettings = {
 	maxLastCmds: 6,
@@ -8,5 +8,5 @@ export const DEFAULT_SETTINGS: RLCSettings = {
 	ifNoCmdOpenPalette: true,
 	includeShortcuts: true,
 	showCmdId: false,
-	excludeCommands: [],
+	excludeCommands: []
 };

@@ -1,8 +1,8 @@
-import { type Command } from "obsidian";
-import { around } from "monkey-around";
-import type RepeatLastCommands from "./main.ts";
-import { getModalCmdVars } from "./cmd-utils.ts";
-import { shouldExcludeCommand } from "./palette.ts";
+import { type Command } from 'obsidian';
+import { around } from 'monkey-around';
+import type RepeatLastCommands from './main.ts';
+import { getModalCmdVars } from './cmd-utils.ts';
+import { shouldExcludeCommand } from './palette.ts';
 
 export function registerCommandFilter(plugin: RepeatLastCommands): () => void {
 	const { settings } = plugin;
@@ -14,14 +14,11 @@ export function registerCommandFilter(plugin: RepeatLastCommands): () => void {
 
 				// Filter excluded commands
 				const filteredCommands = commands.filter(
-					(command) => !settings.excludeCommands.includes(command.id),
+					(command) => !settings.excludeCommands.includes(command.id)
 				);
 
 				// Apply aliases to command names
-				if (
-					settings.aliases &&
-					Object.keys(settings.aliases).length > 0
-				) {
+				if (settings.aliases && Object.keys(settings.aliases).length > 0) {
 					filteredCommands.forEach((command) => {
 						const alias = settings.aliases[command.id];
 						if (alias?.name) {
@@ -34,18 +31,16 @@ export function registerCommandFilter(plugin: RepeatLastCommands): () => void {
 					const { instance } = getModalCmdVars(plugin);
 					// Filter out plugin commands and user excluded commands from recent commands
 					if (instance.recentCommands) {
-						instance.recentCommands =
-							instance.recentCommands.filter(
-								(id: string) =>
-									!shouldExcludeCommand(settings, id),
-							);
+						instance.recentCommands = instance.recentCommands.filter(
+							(id: string) => !shouldExcludeCommand(settings, id)
+						);
 					}
 				} catch (error) {
-					console.debug("Command palette not available", error);
+					console.debug('Command palette not available', error);
 				}
 
 				return filteredCommands;
 			};
-		},
+		}
 	});
 }

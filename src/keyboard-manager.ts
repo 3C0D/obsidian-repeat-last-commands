@@ -1,13 +1,19 @@
-import type RepeatLastCommands from "./main.ts";
-import { addAlias, getConditions, getModalCmdVars, getBackSelection, getBackSelectionById } from "./cmd-utils.ts";
-import { AliasModal, hideCmd, ExcludedCommandsModal } from "./modals.ts";
+import type RepeatLastCommands from './main.ts';
+import {
+	addAlias,
+	getConditions,
+	getModalCmdVars,
+	getBackSelection,
+	getBackSelectionById
+} from './cmd-utils.ts';
+import { AliasModal, hideCmd, ExcludedCommandsModal } from './modals.ts';
 import type {
 	CommandPaletteModal,
 	CommandPalettePlugin,
 	CommandPalettePluginInstance,
-	HotkeysSettingTab,
-} from "obsidian-typings";
-import type { Scope } from "obsidian";
+	HotkeysSettingTab
+} from 'obsidian-typings';
+import type { Scope } from 'obsidian';
 
 export class KeyboardManager {
 	constructor(private plugin: RepeatLastCommands) {}
@@ -27,11 +33,11 @@ export class KeyboardManager {
 		scope: Scope,
 		modal: CommandPaletteModal,
 		instance: CommandPalettePluginInstance,
-		cmdPalette: CommandPalettePlugin | null,
+		cmdPalette: CommandPalettePlugin | null
 	): void {
 		scope.keys.push({
-			key: "P",
-			modifiers: "Ctrl",
+			key: 'P',
+			modifiers: 'Ctrl',
 			scope: scope.keys[0].scope,
 			func: async () => {
 				const { values, chooser } = getConditions(this.plugin);
@@ -45,7 +51,7 @@ export class KeyboardManager {
 				// Toggle pinned status
 				if (instance.options.pinned.includes(selectedId)) {
 					instance.options.pinned = instance.options.pinned.filter(
-						(id: string) => id !== selectedId,
+						(id: string) => id !== selectedId
 					);
 				} else {
 					instance.options.pinned.push(selectedId);
@@ -58,21 +64,20 @@ export class KeyboardManager {
 
 				// Update view
 				modal.close();
-				this.plugin.app.commands.executeCommandById(
-					"command-palette:open",
-				);
+				this.plugin.app.commands.executeCommandById('command-palette:open');
 
-				const { values: newValues, chooser: newChooser } =
-					getConditions(this.plugin);
+				const { values: newValues, chooser: newChooser } = getConditions(
+					this.plugin
+				);
 				await getBackSelectionById(newChooser, newValues, selectedId);
-			},
+			}
 		});
 	}
 
 	private registerAliasCommand(scope: Scope): void {
 		scope.keys.push({
-			key: "A",
-			modifiers: "Ctrl",
+			key: 'A',
+			modifiers: 'Ctrl',
 			scope: scope.keys[0].scope,
 			func: () => {
 				const { chooser } = getConditions(this.plugin);
@@ -85,38 +90,28 @@ export class KeyboardManager {
 					async (result) => {
 						await addAlias(this.plugin, result, selectedItem);
 						await getBackSelection(chooser, selectedItem);
-					},
+					}
 				).open();
-			},
+			}
 		});
 	}
 
-	private registerShowCommand(
-		scope: Scope,
-		modal: CommandPaletteModal,
-	): void {
+	private registerShowCommand(scope: Scope, modal: CommandPaletteModal): void {
 		scope.keys.push({
-			key: "+",
-			modifiers: "Ctrl",
+			key: '+',
+			modifiers: 'Ctrl',
 			scope: scope.keys[0].scope,
 			func: () => {
 				// Open the excluded commands modal without closing the palette
-				new ExcludedCommandsModal(
-					this.plugin.app,
-					this.plugin,
-					modal,
-				).open();
-			},
+				new ExcludedCommandsModal(this.plugin.app, this.plugin, modal).open();
+			}
 		});
 	}
 
-	private registerHideCommand(
-		scope: Scope,
-		modal: CommandPaletteModal,
-	): void {
+	private registerHideCommand(scope: Scope, modal: CommandPaletteModal): void {
 		scope.keys.push({
-			key: "-",
-			modifiers: "Ctrl",
+			key: '-',
+			modifiers: 'Ctrl',
 			scope: scope.keys[0].scope,
 			func: async () => {
 				const { values, chooser } = getConditions(this.plugin);
@@ -135,28 +130,23 @@ export class KeyboardManager {
 
 				await hideCmd(this.plugin, selectedItem, chooser);
 				modal.close();
-				this.plugin.app.commands.executeCommandById(
-					"command-palette:open",
-				);
+				this.plugin.app.commands.executeCommandById('command-palette:open');
 
 				// Wait for the palette to reopen and select the next command
 				setTimeout(async () => {
-					const { values: newValues, chooser: newChooser } =
-						getConditions(this.plugin);
-					await getBackSelectionById(
-						newChooser,
-						newValues,
-						nextItemId,
+					const { values: newValues, chooser: newChooser } = getConditions(
+						this.plugin
 					);
+					await getBackSelectionById(newChooser, newValues, nextItemId);
 				}, 50);
-			},
+			}
 		});
 	}
 
 	private registerHotkeyCommand(scope: Scope): void {
 		scope.keys.push({
-			key: "H",
-			modifiers: "Ctrl",
+			key: 'H',
+			modifiers: 'Ctrl',
 			scope: scope.keys[0].scope,
 			func: async () => {
 				const { values, chooser } = getConditions(this.plugin);
@@ -168,23 +158,19 @@ export class KeyboardManager {
 
 				this.plugin.app.setting.open();
 				this.plugin.app.setting.animateOpen();
-				this.plugin.app.setting.openTabById("hotkeys");
-				const tab = this.plugin.app.setting
-					.activeTab as HotkeysSettingTab;
-				const input = tab.containerEl.querySelector("input")!;
+				this.plugin.app.setting.openTabById('hotkeys');
+				const tab = this.plugin.app.setting.activeTab as HotkeysSettingTab;
+				const input = tab.containerEl.querySelector('input')!;
 				input.focus();
 				input.value = selectedName;
 				tab.updateHotkeyVisibility();
 				input.blur();
 				const old = this.plugin.app.setting.onClose;
 				this.plugin.app.setting.onClose = (): void => {
-					this.plugin.app.commands.executeCommandById(
-						"command-palette:open",
-					);
+					this.plugin.app.commands.executeCommandById('command-palette:open');
 					this.plugin.app.setting.onClose = old;
 				};
-			},
+			}
 		});
 	}
 }
-

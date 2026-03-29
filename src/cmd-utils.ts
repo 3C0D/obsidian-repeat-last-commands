@@ -1,17 +1,14 @@
-import RepeatLastCommands from "./main.ts";
-import { App, Notice, type Command, type FuzzyMatch } from "obsidian";
+import RepeatLastCommands from './main.ts';
+import { App, Notice, type Command, type FuzzyMatch } from 'obsidian';
 import type {
 	CommandPaletteModal,
 	CommandPalettePlugin,
 	CommandPalettePluginInstance,
-	SuggestModalChooser,
-} from "obsidian-typings";
+	SuggestModalChooser
+} from 'obsidian-typings';
 
-export function getCmdPalette(
-	plugin: RepeatLastCommands,
-): CommandPalettePlugin | null {
-	const cmdPalette =
-		plugin.app.internalPlugins.getPluginById("command-palette");
+export function getCmdPalette(plugin: RepeatLastCommands): CommandPalettePlugin | null {
+	const cmdPalette = plugin.app.internalPlugins.getPluginById('command-palette');
 	if (!cmdPalette) {
 		return null;
 	}
@@ -25,8 +22,8 @@ export function getModalCmdVars(plugin: RepeatLastCommands): {
 } {
 	const cmdPalette = getCmdPalette(plugin);
 	if (!cmdPalette) {
-		new Notice("Command palette plugin not found");
-		throw new Error("Command palette plugin not found");
+		new Notice('Command palette plugin not found');
+		throw new Error('Command palette plugin not found');
 	}
 	const instance = cmdPalette.instance;
 	const modal = instance.modal;
@@ -52,7 +49,7 @@ export function getCommandName(app: App, id: string): string {
 			return command.name;
 		}
 	} catch (err) {
-		console.log("Error finding command:", err);
+		console.log('Error finding command:', err);
 	}
 	return id; // Return the ID if the name is not found
 }
@@ -63,24 +60,24 @@ export function getCommandName(app: App, id: string): string {
 export async function addAlias(
 	plugin: RepeatLastCommands,
 	result: string,
-	selectedItem: number,
+	selectedItem: number
 ): Promise<void> {
 	const { values, aliases, chooser } = getConditions(plugin);
 	if (!values) {
-		new Notice("No commands available to alias.");
+		new Notice('No commands available to alias.');
 		return;
 	}
 	const { item } = values[selectedItem];
 	const selectedId = item.id;
-	const value = result?.trim() ?? "";
+	const value = result?.trim() ?? '';
 	const { commands } = plugin.app.commands;
 	const commandName = commands[selectedId].name;
 	let text: string;
 
 	// Remove any existing alias (format [alias])
-	const cleanedName = commandName.replace(/^\[.*?\]\s*/, "");
+	const cleanedName = commandName.replace(/^\[.*?\]\s*/, '');
 
-	if (value === "") {
+	if (value === '') {
 		// If no alias is provided, simply remove the existing alias
 		text = cleanedName;
 		delete aliases[selectedId];
@@ -101,19 +98,19 @@ export async function addAlias(
 
 export async function getBackSelection(
 	chooser: any,
-	selectedItem: number,
+	selectedItem: number
 ): Promise<void> {
 	try {
 		chooser.forceSetSelectedItem(selectedItem);
 	} catch (err) {
-		console.log("Error setting selection:", err);
+		console.log('Error setting selection:', err);
 	}
 }
 
 export async function getBackSelectionById(
 	chooser: any,
 	values: any[] | null,
-	itemId: string | undefined,
+	itemId: string | undefined
 ): Promise<void> {
 	try {
 		if (values && itemId) {
@@ -123,6 +120,6 @@ export async function getBackSelectionById(
 			}
 		}
 	} catch (err) {
-		console.log("Error finding item by ID:", err);
+		console.log('Error finding item by ID:', err);
 	}
 }
