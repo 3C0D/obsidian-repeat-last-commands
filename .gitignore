@@ -28,6 +28,7 @@ main.css
 # VSCode - keep settings.json for yarn protection
 .vscode/*
 !.vscode/settings.json
+!.vscode/tasks.json
 
 # Keep injection info for traceability
 # .injection-info.json should be committed to track injection version
